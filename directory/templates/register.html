@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Full Profile Flow</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .card-header { background: #bf953f; color: white; padding: 20px; text-align: center; }
+        .card-body .section-box { 
+    background: #f9f9f9; 
+    padding: 15px; 
+    border-radius: 12px; 
+    border: 1px solid #eee; 
+    margin-bottom: 20px;
+    display: flex;           
+    flex-direction: column;  
+}
+        label { font-size: 13px; font-weight: 600; color: #444; display: block; margin-bottom: 5px; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; transition: 0.3s; }
+        input:focus { border-color: #bf953f; }
+        .section-box { background: #f9f9f9; padding: 15px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 20px; }
+        .spouse-box { background: #fffbe6; padding: 15px; border-radius: 10px; border: 1px solid #ffe58f; margin-top: 10px; }
+        .btn-add { background: #fff; border: 1px dashed #bf953f; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; color: #bf953f; font-weight: bold; margin-bottom: 15px; }
+        .btn-submit { width: 100%; padding: 15px; background: #bf953f; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header"><h2>Member Registration</h2></div>
+    <div class="card-body">
+        <form action="{% if member and member.id %}/update-member/{{ member.id }}/{% else %}/save-member/{% endif %}" method="POST">
+            {% csrf_token %}
+
+            <div class="section-box">
+                <p style="font-weight: bold; color: #bf953f; margin-bottom: 10px;">1. Mukhiya (Head) Ki Details</p>
+                <label>Full Name:</label>
+                <input type="text" name="name" required placeholder="Mukhiya ka Naam" value="{{ member.name|default:'' }}">
+                
+                <div style="display:flex;flex-direction:column;gap: 10px;">
+                    <div>
+                        <label>Phone:</label>
+                        <input type="tel" name="phone_number" value="{{ temp_phone }}" required maxlength="10">
+                    </div>
+                    <div>
+                        <label>Birth Date:</label>
+                        <input type="date" name="dob" max="2026-12-31" onkeydown="return false" value="{{ member.dob|date:'Y-m-d' }}">
+                    </div>
+                </div>
+
+                <label style="margin-top: 10px; display: block;">Marital Status:</label>
+                <select name="marital_status" id="self_status" onchange="toggleSpouse('self_status', 'self_spouse_div')" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                    <option value="unmarried" {% if member.marital_status == 'unmarried' %}selected{% endif %}>Unmarried</option>
+                    <option value="married" {% if member.marital_status == 'married' %}selected{% endif %}>Married</option>
+                </select>
+
+                <div id="self_spouse_div" class="spouse-box" style="display: {% if member.marital_status == 'married' %}block{% else %}none{% endif %}; border: 1px dashed #bf953f; padding: 10px; border-radius: 5px; margin-bottom: 15px; background: #fdfaf3;">
+                    <label>Spouse Name:</label>
+                    <input type="text" name="spouse_name" value="{{ member.spouse_name|default:'' }}" placeholder="Pati/Patni ka naam">
+                    
+                    <div style="display:flex;flex-direction:column;gap: 10px; margin-top: 5px;">
+                        <div>
+                            <label>Spouse Phone:</label>
+                            <input type="tel" name="spouse_phone" maxlength="10" value="{{ member.spouse_phone|default:'' }}">
+                        </div>
+                        <div>
+                            <label>Spouse DOB:</label>
+                            <input type="date" name="spouse_dob" max="2026-12-31" onkeydown="return false" value="{{ member.spouse_dob|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div><label>Gotra:</label><input type="text" name="gotra" required value="{{ member.gotra|default:'' }}"></div>
+                    <div><label>Area:</label>
+                        <select name="area" id="id_area" class="form-control" required>
+                            <option value="">-- Select Your Area --</option>
+                            {% for a in areas %}
+                                <option value="{{ a.id }}" {% if member.area and member.area.id == a.id %}selected{% endif %}>{{ a.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <label style="margin-top: 10px; display: block;">Address:</label>
+                <textarea name="detailed_address" rows="2" style="width: 100%;">{{ member.detailed_address|default:'' }}</textarea>
+            </div>
+
+            <div class="section-box" style="margin-top: 20px; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
+                <label style="font-weight: bold; color: #bf953f;">Security PIN (4 Digits):</label>
+                <input type="password" name="pin" maxlength="4" placeholder="Enter 4-digit PIN" required value="{{ member.pin|default:'' }}" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+
+            <div id="family-container">
+                <p style="font-weight: bold; color: #bf953f; margin-top: 15px;">Other Family Members:</p>
+                {% for fm in member.family_members.all %}
+                <div class="family-row" style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px; position: relative; border: 1px solid #ddd;">
+                    <button type="button" onclick="this.parentElement.remove()" style="position: absolute; right: 10px; top: 10px; color: red; border: none; background: none; cursor: pointer; font-weight: bold;">✕</button>
+                    
+                    <label>Member Name:</label>
+                    <input type="text" name="member_name[]" value="{{ fm.name }}" required style="width: 100%; margin-bottom: 10px;">
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div><label>Phone:</label><input type="tel" name="member_phone[]" value="{{ fm.phone|default:'' }}" maxlength="10" style="width: 100%;"></div>
+                        <div><label>Birth Date:</label><input type="date" name="member_dob[]" value="{{ fm.dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;"></div>
+                    </div>
+
+                    <label style="margin-top: 10px; display: block;">Status:</label>
+                    <select name="member_married[]" id="s_old_{{ forloop.counter }}" onchange="toggleSpouse('s_old_{{ forloop.counter }}', 'd_old_{{ forloop.counter }}')" style="width: 100%; padding: 8px;">
+                        <option value="unmarried" {% if fm.marital_status == 'unmarried' %}selected{% endif %}>Unmarried</option>
+                        <option value="married" {% if fm.marital_status == 'married' %}selected{% endif %}>Married</option>
+                    </select>
+
+                    <div id="d_old_{{ forloop.counter }}" class="spouse-box" style="display: {% if fm.marital_status == 'married' %}block{% else %}none{% endif %}; margin-top: 10px; background: #f0f0f0; padding: 10px; border-radius: 8px; border: 1px dashed #bf953f;">
+                        <label>Spouse Name:</label>
+                        <input type="text" name="member_spouse_name[]" value="{{ fm.spouse_name|default:'' }}" placeholder="Spouse Name" style="width: 100%;">
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <input type="tel" name="member_spouse_phone[]" value="{{ fm.spouse_phone|default:'' }}" placeholder="Spouse Phone" maxlength="10" style="width: 100%;">
+                            <input type="date" name="member_spouse_dob[]" value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" class="btn-add" onclick="addFamilyRow()" style="width: 100%; background: #eee; padding: 10px; border: 1px dashed #bf953f; border-radius: 8px; cursor: pointer; margin-top: 10px;">+ Add Other Family Member</button>
+
+            <button type="submit" class="btn-submit">
+                {% if member and member.id %} Update Everything {% else %} Save Everything {% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleSpouse(selectId, divId) {
+        var statusElement = document.getElementById(selectId);
+        var spouseDiv = document.getElementById(divId);
+        
+        if (statusElement && spouseDiv) {
+            if (statusElement.value === 'married') {
+                spouseDiv.style.display = 'block';
+            } else {
+                spouseDiv.style.display = 'none';
+            }
+        }
+    }
+
+    window.onload = function() {
+        toggleSpouse('self_status', 'self_spouse_div');
+        toggleSpouse('head_status', 'head_spouse_div');
+    };
+
+    function toggleHeadForm(isHead) {
+        document.getElementById('head_full_info').style.display = isHead ? 'none' : 'block';
+    }
+
+    function addFamilyRow() {
+        const id = Date.now();
+        const html = `
+            <div class="family-row" style="position: relative; border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 10px; background: #fdfdfd;">
+                <button type="button" onclick="this.parentElement.remove()" style="position: absolute; right: 10px; top: 10px; color: red; border: none; background: none; cursor: pointer; font-weight: bold;">✕</button>
+                
+                <label>Member Name:</label><input type="text" name="member_name[]" required style="width: 100%; margin-bottom: 10px;">
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div><label>Phone:</label><input type="tel" name="member_phone[]" placeholder="Phone" maxlength="10" style="width: 100%;"></div>
+                    <div><label>Birth Date:</label><input type="date" name="member_dob[]" required onkeydown="return false" style="width: 100%;"></div>
+                </div>
+                
+                <label style="margin-top: 10px; display: block;">Status:</label>
+                <select name="member_married[]" id="s_${id}" onchange="toggleSpouse('s_${id}', 'd_${id}')" style="width: 100%; padding: 8px;">
+                    <option value="unmarried">Unmarried</option>
+                    <option value="married">Married</option>
+                </select>
+
+                <div id="d_${id}" class="spouse-box" style="display: none; margin-top: 10px; background: #f0f0f0; padding: 10px; border-radius: 8px; border: 1px dashed #bf953f;">
+                    <label>Spouse Details:</label>
+                    <input type="text" name="member_spouse_name[]" placeholder="Spouse Name" style="width: 100%; margin-bottom: 5px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="tel" name="member_spouse_phone[]" placeholder="Spouse Phone" maxlength="10" style="width: 100%;">
+                        <input type="date" name="member_spouse_dob[]" onkeydown="return false" style="width: 100%;">
+                    </div>
+                </div>
+            </div>`;
+        document.getElementById('family-container').insertAdjacentHTML('beforeend', html);
+    }
+</script>
+</body>
+</html>

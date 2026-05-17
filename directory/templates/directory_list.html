@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Directory - Maheshwari Samaj</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        
+        .list-card {
+            background: white;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .header { background: #bf953f; color: white; padding: 25px 20px; text-align: center; }
+        
+        /* Search Bar Style */
+        .search-container { padding: 15px 20px; background: #fafafa; border-bottom: 1px solid #eee; }
+        #searchInput {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            outline: none;
+        }
+        #searchInput:focus { border-color: #bf953f; box-shadow: 0 0 5px rgba(191, 149, 63, 0.3); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f2f2f2; }
+        
+        th { background: #fff; color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        tr:hover { background: #fdfaf3; } /* Row hover effect */
+        
+        .member-name { color: #333; font-weight: 600; display: block; }
+        .member-phone { color: #888; font-size: 13px; }
+        
+        .btn-view { 
+            color: #bf953f; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 14px;
+            background: #fdfaf3;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .btn-view:hover { background: #bf953f; color: white; }
+        
+        .footer-links { text-align: center; margin-top: 20px; padding-bottom: 30px; }
+        .back-link { color: #888; text-decoration: none; font-size: 14px; margin: 0 10px; }
+        .back-link:hover { color: #bf953f; }
+    </style>
+</head>
+<body>
+<div class="directory-container" style="padding: 15px; max-width: 500px; margin: auto; background: #fff;">
+    
+    <h2 style="text-align: center; color: #bf953f; font-family: 'serif'; margin-bottom: 25px;">
+        Maheshwari Sadasya Directory
+    </h2>
+
+    <div style="padding: 10px; margin-bottom: 20px;">
+        <form method="GET" action="{% url 'directory_view' %}" style="display: flex; gap: 10px;">
+            <input type="text" name="search" value="{{ query }}" placeholder="Naam ya Number se dhoondein..." 
+                   style="flex: 1; padding: 12px; border: 1px solid #bf953f; border-radius: 8px; outline: none;">
+            
+            <button type="submit" style="background: #bf953f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                🔍
+            </button>
+            
+            {% if query %}
+                <a href="{% url 'directory_view' %}" style="text-decoration: none; padding: 10px; color: #666;">❌</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="list-wrapper">
+        {% for member in members %}
+        <a href="{% url 'profile_view' member.id %}" style="text-decoration: none; color: inherit; display: block; margin-bottom: 12px;">
+            
+            <div class="member-item" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;">
+                
+                <span style="position: absolute; top: 5px; left: 15px; color: #888; font-size: 0.75rem; font-weight: bold;">
+                    #{{ forloop.counter }}
+                </span>
+
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px;">
+                    <div style="width: 45px; height: 45px; background: #fdfaf3; border: 1px solid #bf953f; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #bf953f; font-weight: bold; font-size: 1.2rem;">
+                        {{ member.name|slice:":1"|upper }}
+                    </div>
+                    
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1rem; color: #2c3e50;">{{ member.name }}</div>
+                        <div style="color: #7f8c8d; font-size: 0.9rem;">📞 {{ member.phone_number }}</div>
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <span style="font-size: 0.75rem; background: #bf953f; color: white; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px;">
+                        {{ member.gotra }}
+                    </span>
+                    <div style="color: #bdc3c7; font-size: 1.4rem;">›</div>
+                </div>
+
+            </div>
+        </a>
+        {% empty %}
+            <div style="text-align: center; color: #95a5a6; margin-top: 50px;">
+                <p>Koi sadasya nahi mila.</p>
+                {% if query %}
+                    <a href="{% url 'directory_view' %}" style="color: #bf953f; text-decoration: none; font-weight: bold;">Puri list dekhein</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+function searchFunction() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("memberTable");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1]; 
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+</script>
+
+</body>
+</html>

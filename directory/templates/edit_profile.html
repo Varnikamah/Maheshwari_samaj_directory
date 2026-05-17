@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container" style="max-width: 600px; margin: 20px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #eee;">
+        
+        <h2 style="color: #bf953f; text-align: center; margin-bottom: 20px;">Edit Profile</h2>
+
+        <form action="{% url 'update_member' member.id %}" method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 10px;">
+                <p style="font-weight: bold; color: #bf953f; border-bottom: 1px solid #eee; padding-bottom: 5px;">Aapki Details</p>
+                
+                <label style="display:block; margin-top:10px; font-size:14px;">Full Name:</label>
+                <input type="text" name="name" value="{{ member.name }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
+                    <div>
+                        <label style="font-size:14px;">Phone:</label>
+                        <input type="tel" name="phone_number" value="{{ member.phone_number }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    <div>
+                        <label style="font-size:14px;">Birth Date:</label>
+                        <input type="date" name="dob" value="{{ member.dob|date:'Y-m-d' }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #e3f2fd; border-radius: 10px; background: #f0f7ff;">
+                <label style="font-weight: bold; color: #0050b3;">क्या आप ही परिवार के मुखिया (Head) हैं?</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <label><input type="radio" name="is_head" value="yes" id="is_head_yes" {% if member.is_head %}checked{% endif %} onclick="toggleHeadSection()"> हाँ</label>
+                    <label><input type="radio" name="is_head" value="no" id="is_head_no" {% if not member.is_head %}checked{% endif %} onclick="toggleHeadSection()"> नहीं</label>
+                </div>
+
+                <div id="head_full_info" style="display: {% if member.is_head %}none{% else %}block{% endif %}; margin-top: 15px; border-top: 1px solid #bcdffb; padding-top: 10px;">
+                    <p style="font-weight: bold; color: #0050b3; font-size: 14px;">Mukhiya Ki Details</p>
+                    <input type="text" name="head_name" placeholder="Mukhiya Name" value="{{ member.head_name }}" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="tel" name="head_phone" placeholder="Mukhiya Phone" value="{{ member.head_phone }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
+                        <input type="date" name="head_dob" value="{{ member.head_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    
+                    <label style="display:block; margin-top:10px; font-size:14px;">Mukhiya Spouse Details:</label>
+                    <input type="text" name="head_spouse_name" placeholder="Spouse Name" value="{{ member.head_spouse_name }}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
+                        <input type="tel" name="head_spouse_phone" placeholder="Spouse Phone" value="{{ member.head_spouse_phone }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
+                        <input type="date" name="head_spouse_dob" value="{{ member.head_spouse_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #eee; border-radius: 10px;">
+                <p style="font-weight: bold; color: #bf953f;">Any Other Family Members?</p>
+                <div id="family-members-container">
+                    {% for fm in member.family_members.all %}
+                    <div class="family-member-row" style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px; position:relative;">
+                        <input type="text" name="member_name[]" value="{{ fm.name }}" placeholder="Name" style="width:80%; padding:5px; margin-bottom:5px;">
+                        <input type="date" name="member_dob[]" value="{{ fm.dob|date:'Y-m-d' }}" style="width:45%; padding:5px;">
+                        <input type="tel" name="member_phone[]" value="{{ fm.phone }}" placeholder="Phone" style="width:45%; padding:5px;">
+                        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer;">✖ Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addMemberRow()" style="background:#eee; border:1px dashed #ccc; width:100%; padding:10px; cursor:pointer;">+ Add Family Member</button>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display:block; font-size:14px;">Gotra:</label>
+                <input type="text" name="gotra" value="{{ member.gotra }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                
+                <div style="margin-top:10px;">
+               <label style="display:block; font-size:14px;">Area PIN Code:</label>
+               <input type="text" name="pin" value="{{ member.pin }}" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+               </div>
+
+                <label style="display:block; margin-top:10px; font-size:14px;">Detailed Address:</label>
+                <textarea name="detailed_address" rows="3" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">{{ member.detailed_address }}</textarea>
+            </div>
+
+            <button type="submit" style="width: 100%; background: #bf953f; color: white; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleHeadSection() {
+    const isHeadNo = document.getElementById('is_head_no').checked;
+    document.getElementById('head_full_info').style.display = isHeadNo ? 'block' : 'none';
+}
+
+function addMemberRow() {
+    const container = document.getElementById('family-members-container');
+    const div = document.createElement('div');
+    div.className = 'family-member-row';
+    div.style = "background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px;";
+    div.innerHTML = `
+        <input type="text" name="member_name[]" placeholder="Name" style="width:80%; padding:5px; margin-bottom:5px;">
+        <input type="date" name="member_dob[]" style="width:45%; padding:5px;">
+        <input type="tel" name="member_phone[]" placeholder="Phone" style="width:45%; padding:5px;">
+        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer;">✖</button>
+    `;
+    container.appendChild(div);
+}
+</script>
+
+<script>
+    function toggleSelfSpouse() {
+        const status = document.getElementById('self_status').value;
+        document.getElementById('self_spouse_div').style.display = (status === 'married') ? 'block' : 'none';
+    }
+
+    function toggleHeadSection() {
+        const isHeadNo = document.getElementById('is_head_no').checked;
+        document.getElementById('head_full_info').style.display = isHeadNo ? 'block' : 'none';
+    }
+
+    function toggleHeadSpouse() {
+        const status = document.getElementById('head_status').value;
+        document.getElementById('head_spouse_div').style.display = (status === 'married') ? 'block' : 'none';
+    }
+
+    window.onload = function() {
+        toggleSelfSpouse();
+        toggleHeadSection();
+        toggleHeadSpouse();
+    };
+</script>
+
+{% endblock %}
