@@ -3,6 +3,7 @@ from datetime import date
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
+
 class Area(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):

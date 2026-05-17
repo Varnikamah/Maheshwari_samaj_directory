@@ -47,7 +47,7 @@
                     </div>
                     <div>
                         <label>Birth Date:</label>
-                        <input type="date" name="dob" max="2026-12-31" onkeydown="return false" value="{{ member.dob|date:'Y-m-d' }}">
+                        <input type="date" name="dob" onkeydown="return false" class="dob-field" value="{{ member.dob|date:'Y-m-d' }}">
                     </div>
                 </div>
 
@@ -68,7 +68,7 @@
                         </div>
                         <div>
                             <label>Spouse DOB:</label>
-                            <input type="date" name="spouse_dob" max="2026-12-31" onkeydown="return false" value="{{ member.spouse_dob|date:'Y-m-d' }}">
+                            <input type="date" name="spouse_dob" onkeydown="return false" class="dob-field" value="{{ member.spouse_dob|date:'Y-m-d' }}">
                         </div>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                     
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <div><label>Phone:</label><input type="tel" name="member_phone[]" value="{{ fm.phone|default:'' }}" maxlength="10" style="width: 100%;"></div>
-                        <div><label>Birth Date:</label><input type="date" name="member_dob[]" value="{{ fm.dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;"></div>
+                        <div><label>Birth Date:</label><input type="date" name="member_dob[]" class="dob-field" value="{{ fm.dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;"></div>
                     </div>
 
                     <label style="margin-top: 10px; display: block;">Status:</label>
@@ -120,7 +120,7 @@
                         <input type="text" name="member_spouse_name[]" value="{{ fm.spouse_name|default:'' }}" placeholder="Spouse Name" style="width: 100%;">
                         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                             <input type="tel" name="member_spouse_phone[]" value="{{ fm.spouse_phone|default:'' }}" placeholder="Spouse Phone" maxlength="10" style="width: 100%;">
-                            <input type="date" name="member_spouse_dob[]" value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
+                            <input type="date" name="member_spouse_dob[]" class="dob-field"value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
                         </div>
                     </div>
                 </div>
@@ -137,6 +137,15 @@
 </div>
 
 <script>
+
+
+    let todayDate = new Date().toISOString().split('T')[0];
+    let dobFields = document.querySelectorAll('.dob-field');
+    dobFields.forEach(function(field) {
+        field.setAttribute('max', todayDate);
+    });
+
+
     function toggleSpouse(selectId, divId) {
         var statusElement = document.getElementById(selectId);
         var spouseDiv = document.getElementById(divId);
@@ -188,6 +197,7 @@
                 </div>
             </div>`;
         document.getElementById('family-container').insertAdjacentHTML('beforeend', html);
+
     }
 </script>
 </body>
