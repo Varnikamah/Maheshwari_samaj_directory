@@ -119,7 +119,8 @@
             Sadasya No: #{{ member.registration_no }}
         </span>
     <div style="width: 100%; border-radius: 15px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <img src="/static/jskmahesh.png" style="width: 100%; display: block;" alt="Jai Mahesh">
+        {% load static %}
+        <img src="{% static 'jskmahesh.png' %}" style="width: 100%; display: block;" alt="Jai Mahesh">
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
