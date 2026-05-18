@@ -110,7 +110,7 @@ class FamilyMemberInline(admin.TabularInline):
     model = FamilyMember
     extra = 0
     readonly_fields = ['display_age', 'display_spouse_age']
-    fields = ['name', 'phone', 'dob', 'display_age', 'marital_status', 'spouse_name', 'display_spouse_age']
+    fields = ['name', 'phone', 'dob','display_age', 'marital_status', 'spouse_name','spouse_dob','display_spouse_age']
 
     def display_age(self, obj):
         return f"{obj.age} Yrs" if obj.age else "--"
@@ -119,7 +119,6 @@ class FamilyMemberInline(admin.TabularInline):
     def display_spouse_age(self, obj):
         return f"{obj.spouse_age} Yrs" if obj.spouse_age else "--"
     display_spouse_age.short_description = 'Spouse Age'
-
 
 # Main Member Admin (Parivar Head ke liye)
 @admin.register(Member)
