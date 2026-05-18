@@ -115,9 +115,10 @@
 </style>
 </head>
 <div class="profile-wrapper">
-        <span style="background: #bf953f; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 10px;">
-            Sadasya No: #{{ member.registration_no }}
-        </span>
+    <span style="background: #bf953f; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 10px;">
+        Sadasya No: #{{ member.registration_no }}
+    </span>
+
     <div style="width: 100%; border-radius: 15px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         {% load static %}
         <img src="{% static 'jskmahesh.png' %}" style="width: 100%; display: block;" alt="Jai Mahesh">
@@ -159,7 +160,7 @@
             </p>
         </div>
         {% endif %}
-
+    </div>
 
     <div class="info-card">
         <div class="card-title" style="color: #bf953f; font-weight: bold; margin-bottom: 10px;">📍 Address & Location</div>
@@ -180,19 +181,19 @@
             </div>
             <div style="margin-top: 5px; font-size: 13px; color: #555;">
                 <div>🎂 DOB: {{ fm.dob|date:"d M, Y"|default:"--" }} 
-                     {% if fm.dob %}<strong>(Age: {{ fm.age }} Yrs)</strong>{% endif %}
+                    {% if fm.dob %}<strong>(Age: {{ fm.age }} Yrs)</strong>{% endif %}
                 </div>
                 <div>📞 Phone: {{ fm.phone|default:"--" }}</div>
                 
                 {% if fm.marital_status == 'married' %}
-                 <div style="margin-top: 8px; padding-top: 5px; border-top: 1px dashed #ccc; color: #bf953f;">
+                <div style="margin-top: 8px; padding-top: 5px; border-top: 1px dashed #ccc; color: #bf953f;">
                     💍 <strong>Spouse:</strong> {{ fm.spouse_name|default:"--" }}<br>
                     📞 <strong>Spouse Phone:</strong> {{ fm.spouse_phone|default:"--" }}<br>
                     🎂 <strong>Spouse DOB:</strong> {{ fm.spouse_dob|date:"d M, Y"|default:"--" }}
                     {% if fm.spouse_dob %}
-                         <strong>(Age: {{ fm.spouse_age }} Yrs)</strong>
+                        <strong>(Age: {{ fm.spouse_age }} Yrs)</strong>
                     {% endif %}
-                 </div>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -208,13 +209,13 @@
         <a href="/" class="back-link" style="display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 14px;">← Back to Directory</a>
     </div>
 </div>
+
 <script>
     function checkPassword(memberId, correctPassword) {
         var userPass = prompt("Please enter your Security PIN to edit:");
         if (userPass == null) return; 
         
         if (userPass === correctPassword) {
-
             window.location.href = "/edit/" + memberId + "/";
         } else {
             alert("Wrong PIN! Access Denied.");
@@ -226,6 +227,5 @@
         if (msg) msg.style.display = 'none';
     }, 3000);
 </script>
-
 </body>
 </html>
