@@ -153,11 +153,13 @@
             <h3 style="margin: 8px 0; color: white;">{{ member.spouse_name|default:"--" }}</h3>
             <p style="font-size: 14px; margin: 4px 0; color: white;">📞 Phone: {{ member.spouse_phone|default:"--" }}</p>
             <p style="font-size: 14px; margin: 0; color: white;">🎂 DOB: {{ member.spouse_dob|date:"d M, Y"|default:"--" }} 
-               {% if member.spouse_dob %}
-    {% if member.spouse_age %}
-        <strong>(Age: {{ member.head_spouse_age }} Yrs)</strong>
-    {% endif %}
-    </div>
+                {% if member.spouse_dob and member.head_spouse_age %}
+                    <strong>(Age: {{ member.head_spouse_age }} Yrs)</strong>
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+
 
     <div class="info-card">
         <div class="card-title" style="color: #bf953f; font-weight: bold; margin-bottom: 10px;">📍 Address & Location</div>

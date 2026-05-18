@@ -20,7 +20,8 @@ def export_member_directory_to_excel(modeladmin, request, queryset):
     ws.title = "Parivar Directory"
     
     headers = [
-        'Registration No', 'Category / Relation', 'Name', 'Phone Number', 
+        'Registration No', 'Category / Relation', 'Name', ''
+        'Phone Number', 
         'Date of Birth', 'Age', 'Marital Status', 'Spouse Name', 
         'Detailed Address', 'Area', 'Gotra'
     ]
