@@ -62,10 +62,10 @@ class Member(models.Model):
       return None
 
     @property
-    def head_spouse_age(self):
-        if self.head_spouse_dob:
+    def spouse_dob(self):
+        if self.spouse_dob:
             today = date.today()
-            return today.year - self.head_spouse_dob.year - ((today.month, today.day) < (self.head_spouse_dob.month, self.head_spouse_dob.day))
+            return today.year - self.spouse_dob.year - ((today.month, today.day) < (self.spouse_dob.month, self.spouse_dob.day))
         return None
 @receiver(post_delete, sender=Member)
 def reorder_registration_numbers(sender, instance, **kwargs):
