@@ -107,7 +107,7 @@ def export_only_family_members_to_excel(modeladmin, request, queryset):
 # =========================================================================
 
 # Family Member Inline
-class FamilyMemberInline(admin.TabularInline):
+class FamilyMemberInline(admin.TabularInline if hasattr(admin, 'TabularInline') else admin.TabularInline):
     model = FamilyMember
     extra = 0
     readonly_fields = ['display_age', 'display_spouse_age']
