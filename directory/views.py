@@ -65,9 +65,9 @@ def update_member(request, id):
         f_phones = request.POST.getlist('member_phone[]')
         f_dobs = request.POST.getlist('member_dob[]')
         f_status = request.POST.getlist('member_married[]')
-        f_spouses = request.POST.getlist('member_spouse_name[]')
-        f_spouse_phones = request.POST.getlist('member_spouse_phone[]')
-        f_spouse_dobs = request.POST.getlist('member_spouse_dob[]')
+        f_sp_names = request.POST.getlist('member_spouse_name[]')
+        f_sp_phones = request.POST.getlist('member_spouse_phone[]')
+        f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
 
         member.family_members.all().delete()
 
@@ -80,12 +80,12 @@ def update_member(request, id):
                     phone=f_phones[i] if i < len(f_phones) else "",
                     dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
                     marital_status=f_status[i] if i < len(f_status) else "unmarried",
-                    spouse_name=f_spouses[i] if i < len(f_spouses) else "",
-                    spouse_phone=f_spouse_phones[i] if i < len(f_spouse_phones) else "",
-                    spouse_dob=f_spouse_dobs[i] if (i < len(f_spouse_dobs) and f_spouse_dobs[i]) else None
+                    spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
+                    spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
+                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
                 )
                 print(f"DEBUG: Updated and Saved family member {name_val}")
-
+                
         return redirect('profile_view', member_id=member.id)
 def save_member(request):
     if request.method == "POST":
