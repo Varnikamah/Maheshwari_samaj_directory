@@ -154,12 +154,9 @@
             <p style="font-size: 14px; margin: 4px 0; color: white;">📞 Phone: {{ member.spouse_phone|default:"--" }}</p>
             <p style="font-size: 14px; margin: 0; color: white;">🎂 DOB: {{ member.spouse_dob|date:"d M, Y"|default:"--" }} 
                {% if member.spouse_dob %}
-    {% if member.main_spouse_age %}
-        <strong>(Age: {{ member.main_spouse_age }} Yrs)</strong>
-    {% else %}
-        <strong>(Age: --)</strong>
+    {% if member.spouse_age %}
+        <strong>(Age: {{ member.head_spouse_age }} Yrs)</strong>
     {% endif %}
-{% endif %}
     </div>
 
     <div class="info-card">
