@@ -62,8 +62,8 @@ class Member(models.Model):
       return None
 
     @property
-    def spouse_dob(self):
-        if self.spouse_dob:
+    def head_spouse_age(self):
+        if self.spouse_dob:  # Check karega DateField ko
             today = date.today()
             return today.year - self.spouse_dob.year - ((today.month, today.day) < (self.spouse_dob.month, self.spouse_dob.day))
         return None
