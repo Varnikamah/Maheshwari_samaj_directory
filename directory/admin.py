@@ -124,11 +124,11 @@ class FamilyMemberInline(admin.TabularInline if hasattr(admin, 'TabularInline') 
 # Main Member Admin (Parivar Head ke liye)
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
-    # list_display mein humne 'get_family_details' column jod diya hai
+    # list_display ko ekdum safe rakh rahe hain, bina kisi complex HTML loop ke
     list_display = [
         'registration_no', 'name', 'phone_number', 'pin', 
         'get_head_age', 'spouse_name', 'get_head_spouse_age', 
-        'get_family_details', 'area', 'gotra', 'marital_status'
+        'get_family_members', 'area', 'gotra', 'marital_status'
     ]
     ordering = ['registration_no']
     readonly_fields = ['registration_no', 'get_head_age', 'get_head_spouse_age']
@@ -148,10 +148,12 @@ class MemberAdmin(admin.ModelAdmin):
     inlines = [FamilyMemberInline]
     actions = [export_member_directory_to_excel]  
 
+    # 1. Head Age
     def get_head_age(self, obj):
         return f"{obj.age} Yrs" if obj.age else "--"
     get_head_age.short_description = 'Age'
 
+    # 2. Spouse Age
     def get_head_spouse_age(self, obj):
         if obj.spouse_dob:
             from datetime import date
@@ -161,28 +163,13 @@ class MemberAdmin(admin.ModelAdmin):
         return "--"
     get_head_spouse_age.short_description = 'Spouse Age'
 
-    # 🎯 YEH HAI ASLI KAMAAL! Isse admin table mein family members sundar tarike se rows/columns mein dikhenge
-    def get_family_details(self, obj):
-        f_members = obj.family_members.all()
-        if f_members:
-            # HTML table design jo admin panel ke andar ekdum clean look degi
-            html_content = '<table style="width:100%; border-collapse: collapse; background: transparent; margin:0; padding:0;">'
-            for m in f_members:
-                age_display = f"{m.age} Yrs" if m.age else "--"
-                phone_display = m.phone if m.phone else "--"
-                
-                html_content += f'''
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 2px 5px; font-weight: bold; color: #444;">👤 {m.name}</td>
-                    <td style="padding: 2px 5px; color: #666; font-size: 11px;">📞 {phone_display}</td>
-                    <td style="padding: 2px 5px; color: #bf953f; font-weight: bold; font-size: 11px;">🎂 {age_display}</td>
-                </tr>
-                '''
-            html_content += '</table>'
-            return format_html(html_content)
-        return format_html('<span style="color: #999; font-style: italic;">No family members</span>')
-    
-    get_family_details.short_description = 'Family Members Details (Name | Phone | Age)'
+    # 🎯 3. YEH EKDOM SAFE TARIKA HAI: Saare family members ke naam comma se print honge, bina crash kiye
+    def get_family_members(self, obj):
+        members = obj.family_members.all()
+        if members:
+            return ", ".join([m.name for m in members])
+        return "--"
+    get_family_members.short_description = 'Family Members'
 @admin.register(FamilyMember)
 class FamilyMemberAdmin(admin.ModelAdmin):
     list_display = ['name', 'phone', 'marital_status', 'spouse_name', 'member']  
