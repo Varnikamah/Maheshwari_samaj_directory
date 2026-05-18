@@ -78,8 +78,7 @@ WSGI_APPLICATION = 'SamajPortal.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        # Jo Neon se copy kiya hai, use is single quote ke andar paste kar do
-        default='postgres://yahan_apni_neon_url_paste_karo?sslmode=require',
+        default='postgresql://neondb_owner:npg_TltKVyqoxA91@ep-twilight-breeze-aqw4aztr-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require',
         conn_max_age=600
     )
 }
