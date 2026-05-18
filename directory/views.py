@@ -118,6 +118,7 @@ def save_member(request):
             member = Member.objects.create(
                 name=name,
                 phone_number=phone_number,
+                login_number=phone_number,
                 dob=dob,
                 marital_status=marital_status,
                 spouse_name=spouse_name,
