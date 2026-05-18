@@ -32,7 +32,7 @@
 <div class="card">
     <div class="card-header"><h2>Member Registration</h2></div>
     <div class="card-body">
-        <form action="{% if member and member.id %}/update-member/{{ member.id }}/{% else %}/save-member/{% endif %}" method="POST">
+        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}{% endif %}" method="POST">
             {% csrf_token %}
 
             <div class="section-box">
@@ -43,7 +43,7 @@
                 <div style="display:flex;flex-direction:column;gap: 10px;">
                     <div>
                         <label>Phone:</label>
-                        <input type="tel" name="phone_number" value="{{ temp_phone }}" required maxlength="10">
+                        <input type="tel" name="phone_number" value="{% if member %}{{ member.phone_number }}{% else %}{{ temp_phone }}{% endif %}" required maxlength="10">
                     </div>
                     <div>
                         <label>Birth Date:</label>

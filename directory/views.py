@@ -9,22 +9,32 @@ def smart_login(request):
     if request.method == "POST":
         phone = request.POST.get('phone_number', '').strip()
         
-        print(f"DEBUG: Login Attempt with Phone -> {phone}")
+        # 1. Debug: Dekhte hain form se kya number aaya
+        print(f"👉 DEBUG 1: Input Phone from Form = '{phone}'")
 
-        clean_phone = phone[-10:] if len(phone) >= 10 else phone
-        
-        member = Member.objects.filter(phone_number__icontains=clean_phone).first()
-        
-        print(f"DEBUG: Member Found in DB -> {member}")
+        # Sirf digits nikalna (space, +91, ya zero sab saaf karne ke liye)
+        clean_phone = ''.join(filter(str.isdigit, phone))
+        if len(clean_phone) >= 10:
+            clean_phone = clean_phone[-10:]
+            
+        # 2. Debug: Dekhte hain safai ke baad 10 digit kya bane
+        print(f"👉 DEBUG 2: Cleaned 10-Digit Phone = '{clean_phone}'")
 
-        if member:
-            return redirect('profile_view', member_id=member.id)
-        else:
-            request.session['temp_phone'] = clean_phone
-            return redirect('register')
+        # Agar number khali nahi hai toh database mein check karenge
+        if clean_phone:
+            # Exact match lagate hain direct phone_number field par
+            member = Member.objects.filter(phone_number=clean_phone).first()
+            
+            # 3. Debug: Dekhte hain Django ne sahi mein dhoonda ya nahi
+            print(f"👉 DEBUG 3: Database Query Result = {member}")
+            if member:
+                print(f"👉 DEBUG 4: Matching Member Found! ID: {member.id}, Name: {member.name}, Phone: {member.phone_number}")
+                return redirect('profile_view', member_id=member.id)
+            
+        request.session['temp_phone'] = clean_phone
+        return redirect('register')
             
     return render(request, 'home.html')
-
 def register(request):
     areas = Area.objects.all()
     return render(request, 'register.html', {'areas': areas})
