@@ -1,6 +1,6 @@
 
 from urllib import request
-
+import traceback
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Area, Member, FamilyMember
 from django.db.models import Q
@@ -87,68 +87,86 @@ def update_member(request, id):
                 print(f"DEBUG: Updated and Saved family member {name_val}")
                 
         return redirect('profile_view', member_id=member.id)
+
 def save_member(request):
     if request.method == "POST":
-        name = request.POST.get('name')
-        phone_number = request.POST.get('phone_number')
-        dob = request.POST.get('dob') or None
-        marital_status = request.POST.get('marital_status')
-        
-        spouse_name = request.POST.get('spouse_name')
-        spouse_phone = request.POST.get('spouse_phone')
-        spouse_dob = request.POST.get('spouse_dob') or None
-        
-        gotra = request.POST.get('gotra')
-        detailed_address = request.POST.get('detailed_address')
-        pin = request.POST.get('pin')
-        
-        area_id = request.POST.get('area')
-        area_obj = None
-        if area_id:
-            area_obj = Area.objects.get(id=area_id)
+        try:
+            name = request.POST.get('name')
+            phone_number = request.POST.get('phone_number')
+            dob = request.POST.get('dob')
+            if not dob or dob.strip() == "":
+                dob = None
+                
+            marital_status = request.POST.get('marital_status')
+            spouse_name = request.POST.get('spouse_name')
+            spouse_phone = request.POST.get('spouse_phone')
+            
+            spouse_dob = request.POST.get('spouse_dob')
+            if not spouse_dob or spouse_dob.strip() == "":
+                spouse_dob = None
+            
+            gotra = request.POST.get('gotra')
+            detailed_address = request.POST.get('detailed_address')
+            pin = request.POST.get('pin')
+            
+            area_id = request.POST.get('area')
+            area_obj = None
+            if area_id and area_id.strip() != "":
+                area_obj = Area.objects.get(id=area_id)
 
-        member = Member.objects.create(
-            name=name,
-            phone_number=phone_number,
-            dob=dob,
-            marital_status=marital_status,
-            spouse_name=spouse_name,
-            spouse_phone=spouse_phone,
-            spouse_dob=spouse_dob,
-            gotra=gotra,
-            detailed_address=detailed_address,
-            pin=pin,
-            area=area_obj,
-            is_head=True  
-        )
+            # Mukhiya create kar rahe hain
+            member = Member.objects.create(
+                name=name,
+                phone_number=phone_number,
+                dob=dob,
+                marital_status=marital_status,
+                spouse_name=spouse_name,
+                spouse_phone=spouse_phone,
+                spouse_dob=spouse_dob,
+                gotra=gotra,
+                detailed_address=detailed_address,
+                pin=pin,
+                area=area_obj,
+                is_head=True  
+            )
 
-        f_names = request.POST.getlist('member_name[]')
-        f_phones = request.POST.getlist('member_phone[]')
-        f_dobs = request.POST.getlist('member_dob[]')
-        f_status = request.POST.getlist('member_married[]')
-        f_sp_names = request.POST.getlist('member_spouse_name[]')
-        f_sp_phones = request.POST.getlist('member_spouse_phone[]')
-        f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
+            f_names = request.POST.getlist('member_name[]')
+            f_phones = request.POST.getlist('member_phone[]')
+            f_dobs = request.POST.getlist('member_dob[]')
+            f_status = request.POST.getlist('member_married[]')
+            f_sp_names = request.POST.getlist('member_spouse_name[]')
+            f_sp_phones = request.POST.getlist('member_spouse_phone[]')
+            f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
 
-        for i in range(len(f_names)):
-            name_val = f_names[i].strip()
-            if name_val:
-                FamilyMember.objects.create(
-                    member=member,
-                    name=name_val,
-                    phone=f_phones[i] if i < len(f_phones) else "",
-                    dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
-                    marital_status=f_status[i] if i < len(f_status) else "unmarried",
-                    spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
-                    spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
-                )
+            for i in range(len(f_names)):
+                name_val = f_names[i].strip()
+                if name_val:
+                    # Date cleaning for family members
+                    f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
+                    f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
 
-        return redirect('profile_view', member_id=member.id)
+                    FamilyMember.objects.create(
+                        member=member,
+                        name=name_val,
+                        phone=f_phones[i] if i < len(f_phones) else "",
+                        dob=f_dob_val,
+                        marital_status=f_status[i] if i < len(f_status) else "unmarried",
+                        spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
+                        spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
+                        spouse_dob=f_sp_dob_val
+                    )
+
+            return redirect('profile_view', member_id=member.id)
+            
+        except Exception as e:
+            # 🔥 YEH LINE ASLI ERROR KO RENDER LOGS MEIN ZABARDASTI PRINT KAREGI
+            print("🔴🔴 BHYANKAR BACKEND ERROR DETECTED 🔴🔴")
+            print(traceback.format_exc())
+            # Taki screen par 500 error ke bajay error text dikh jaye testing ke liye
+            from django.http import HttpResponse
+            return HttpResponse(f"Backend Crashed: {str(e)}<br><pre>{traceback.format_exc()}</pre>", status=500)
     
-    return redirect('register') 
-
-
+    return redirect('register')
 def edit_profile(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     areas = Area.objects.all()
