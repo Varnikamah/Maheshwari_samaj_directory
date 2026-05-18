@@ -23,11 +23,11 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.smart_login, name='home'),
-    path('update-member/<int:id>/', views.update_member, name='update_member'),
+    path('update-member/<int:member_id>/', views.update_member, name='update_member'),
     path('register/', views.register, name='register'),
     path('save-member/', views.save_member, name='register_member'), # <-- Yeh line add karo
     path('directory-list/', views.directory_view, name='directory_view'),
-    path('profile/<int:id>/', views.profile_view, name='profile_view'),
+    path('profile/<int:member_id>/', views.profile_view, name='profile_view'),
     path('edit/<int:member_id>/', views.edit_profile, name='edit_profile'),
 ]
 if settings.DEBUG == False:

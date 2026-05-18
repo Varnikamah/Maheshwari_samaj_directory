@@ -18,7 +18,7 @@ def smart_login(request):
         print(f"DEBUG: Member Found in DB -> {member}")
 
         if member:
-            return redirect('profile_view', id=member.id)
+            return redirect('profile_view', member_id=member.id)
         else:
             request.session['temp_phone'] = phone
             return redirect('register_member')
@@ -212,16 +212,16 @@ def directory_view(request):
 
     return render(request, 'directory_list.html', {'members': members, 'query': query})
 
-def profile_view(request, id):
-    member = get_object_or_404(Member.objects.prefetch_related('family_members'), id=id)
+def profile_view(request, member_id):
+    from django.shortcuts import get_object_or_404
+    member = get_object_or_404(Member, id=member_id)
     
     family_members = member.family_members.all()
     
-    print(f"DEBUG: Member {member.name} ke {family_members.count()} family members mile.")
-    
-    return render(request, 'profile.html', {
+    context = {
         'member': member,
         'family_members': family_members
-    })
+    }
+    return render(request, 'profile.html', context)
 def home(request): 
     return render(request, 'home.html')
