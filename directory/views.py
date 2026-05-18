@@ -13,15 +13,15 @@ def smart_login(request):
 
         clean_phone = phone[-10:] if len(phone) >= 10 else phone
         
-        member = Member.objects.filter(phone_number__contains=clean_phone).first()
+        member = Member.objects.filter(phone_number__icontains=clean_phone).first()
         
         print(f"DEBUG: Member Found in DB -> {member}")
 
         if member:
             return redirect('profile_view', member_id=member.id)
         else:
-            request.session['temp_phone'] = phone
-            return redirect('register_member')
+            request.session['temp_phone'] = clean_phone
+            return redirect('register')
             
     return render(request, 'home.html')
 
@@ -76,7 +76,7 @@ def update_member(request, id):
                 )
                 print(f"DEBUG: Updated and Saved family member {name_val}")
 
-        return redirect('profile_view', id=member.id)
+        return redirect('profile_view', member_id=member.id)
 def save_member(request):
     if request.method == "POST":
         name = request.POST.get('name')
