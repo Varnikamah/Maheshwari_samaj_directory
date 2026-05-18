@@ -155,13 +155,27 @@ class FamilyMemberAdmin(admin.ModelAdmin):
     actions = [export_only_family_members_to_excel]
 
 
-# Main Member Admin (Parivar Head ke liye)
+from django.contrib import admin
+from .models import Member, FamilyMember, Area  # Apne models ke naam sahi se check kar lena
+
+# Family Member Inline (Mukhiya ke andar dikhane ke liye)
+class FamilyMemberInline(admin.TabularInline):
+    model = FamilyMember
+    # Family members ki jo fields admin ko unke page par dikhani hain
+    fields = ('name', 'phone', 'marital_status', 'spouse_name', 'relation')
+    extra = 0
+
+# Main Member Admin (Parivar Head aur unki saari details ke liye)
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
-    list_display = ['registration_no', 'name', 'phone_number', 'get_head_age', 'area', 'gotra']
+    # 1. Admin Table Display: Yahan PIN aur Area samne hi dikh jayenge
+    list_display = ['registration_no', 'name', 'phone_number', 'pin', 'get_head_age', 'spouse_name', 'get_head_spouse_age', 'area', 'gotra', 'marital_status']
     ordering = ['registration_no']
+    
+    # PIN aur baaki fields ko edit karne ke liye read-only se hata diya hai taaki admin khud bhi manage kar sake
     readonly_fields = ['registration_no', 'get_head_age', 'get_head_spouse_age']
     
+    # 2. Form Ke Andar Ka Setup: Jab tum kisi member par click karogi, toh saari fields aise grouped dikhengi
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'phone_number', 'dob', 'get_head_age', 'marital_status', 'pin', 'is_head')
@@ -175,7 +189,7 @@ class MemberAdmin(admin.ModelAdmin):
     )
     
     inlines = [FamilyMemberInline]
-    actions = [export_member_directory_to_excel]  # Parivar directory export action jodh diya
+    actions = [export_member_directory_to_excel]  
 
     def get_head_age(self, obj):
         return f"{obj.age} Yrs" if obj.age else "--"
@@ -185,6 +199,13 @@ class MemberAdmin(admin.ModelAdmin):
         return f"{obj.head_spouse_age} Yrs" if obj.head_spouse_age else "--"
     get_head_spouse_age.short_description = 'Spouse Age'
 
+
+# Family Member Admin (Alag se saare family members ki list dekhne ke liye)
+@admin.register(FamilyMember)
+class FamilyMemberAdmin(admin.ModelAdmin):
+    # Isme family member ka naam, phone, status, spouse name aur mukhiya (family) ka naam sab dikhega
+    list_display = ['name', 'phone', 'marital_status', 'spouse_name', 'relation', 'family']  
+    actions = [export_only_family_members_to_excel]
 
 # Area Model ki registration
 admin.site.register(Area)
