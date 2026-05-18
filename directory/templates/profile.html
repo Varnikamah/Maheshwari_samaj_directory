@@ -125,35 +125,26 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <span style="background: #bf953f; color: white; padding: 6px 25px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(191, 149, 63, 0.3); display: inline-block;">
+        <span style="background: #bf953f; color: white; padding: 6px 25px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; display: inline-block;">
             {{ member.gotra }}
         </span>
     </div>
 
-    <div class="mukhiya-card">
-        <span class="mukhiya-badge">👑 Family Head (Mukhiya)</span>
-        <h1 style="margin: 10px 0; color: white;">{{ member.name }}</h1>
+    <div class="mukhiya-card" style="background: #2c3e50; padding: 20px; border-radius: 15px; margin-bottom: 20px; color: white;">
+        <span class="mukhiya-badge" style="background: #bf953f; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem;">👑 Family Head (Mukhiya)</span>
+        <h1 style="margin: 10px 0;">{{ member.name }}</h1>
         
         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-            <div class="detail-row" style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <span style="opacity: 0.9;">📞 Phone:</span>
-                <span style="font-weight: bold; color: white;">{{ member.phone_number }}</span>
-            </div>
-            <div class="detail-row" style="display: flex; justify-content: space-between; padding: 5px 0;">
-                <span style="opacity: 0.9;">🎂 DOB:</span>
-                <span style="font-weight: bold; color: white;">
-                    {{ member.dob|date:"d M, Y"|default:"--" }} 
-                    {% if member.dob %}(Age: {{ member.age }} Yrs){% endif %}
-                </span>
-            </div>
+            <p>📞 Phone: <strong>{{ member.phone_number }}</strong></p>
+            <p>🎂 DOB: <strong>{{ member.dob|date:"d M, Y"|default:"--" }} {% if member.dob %}(Age: {{ member.age }} Yrs){% endif %}</strong></p>
         </div>
 
         {% if member.marital_status == 'married' %}
         <div class="spouse-container" style="background: rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.3);">
             <span class="mukhiya-badge" style="background: #bf953f; font-size: 0.7rem;">👩‍🦰 Spouse Details</span>
-            <h3 style="margin: 8px 0; color: white;">{{ member.spouse_name|default:"--" }}</h3>
-            <p style="font-size: 14px; margin: 4px 0; color: white;">📞 Phone: {{ member.spouse_phone|default:"--" }}</p>
-            <p style="font-size: 14px; margin: 0; color: white;">🎂 DOB: {{ member.spouse_dob|date:"d M, Y"|default:"--" }} 
+            <h3 style="margin: 8px 0;">{{ member.spouse_name|default:"--" }}</h3>
+            <p style="font-size: 14px; margin: 4px 0;">📞 Phone: {{ member.spouse_phone|default:"--" }}</p>
+            <p style="font-size: 14px; margin: 0;">🎂 DOB: {{ member.spouse_dob|date:"d M, Y"|default:"--" }} 
                 {% if member.spouse_dob and member.head_spouse_age %}
                     <strong>(Age: {{ member.head_spouse_age }} Yrs)</strong>
                 {% endif %}
@@ -162,37 +153,29 @@
         {% endif %}
     </div>
 
-    <div class="info-card">
-        <div class="card-title" style="color: #bf953f; font-weight: bold; margin-bottom: 10px;">📍 Address & Location</div>
-        <p style="font-size: 15px; color: #444; margin-bottom: 10px; line-height: 1.4;">{{ member.detailed_address }}</p>
-        <div style="border-top: 1px solid #eee; padding-top: 10px; font-size: 14px;">
-            <strong>Area:</strong> {{ member.area.name|default:"Not Specified" }}
-        </div>
+    <div class="info-card" style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div style="color: #bf953f; font-weight: bold; margin-bottom: 10px;">📍 Address & Location</div>
+        <p style="font-size: 15px; color: #444;">{{ member.detailed_address }}</p>
+        <p style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;"><strong>Area:</strong> {{ member.area.name|default:"Not Specified" }}</p>
     </div>
 
-    <div class="info-card">
-        <div class="card-title" style="color: #bf953f; font-weight: bold; margin-bottom: 15px;">👨‍👩‍👧‍👦 Family Members</div>
+    <div class="info-card" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div style="color: #bf953f; font-weight: bold; margin-bottom: 15px;">👨‍👩‍👧‍👦 Family Members</div>
         
-        {% for fm in member.family_members.all %}
+        {% for fm in family_members %}
         <div style="padding: 12px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #bf953f;">
             <div style="display: flex; justify-content: space-between;">
                 <span style="font-weight: bold;">{{ fm.name }}</span>
                 <span style="font-size: 11px; background: #ddd; padding: 2px 8px; border-radius: 10px;">{{ fm.marital_status|capfirst }}</span>
             </div>
             <div style="margin-top: 5px; font-size: 13px; color: #555;">
-                <div>🎂 DOB: {{ fm.dob|date:"d M, Y"|default:"--" }} 
-                    {% if fm.dob %}<strong>(Age: {{ fm.age }} Yrs)</strong>{% endif %}
-                </div>
-                <div>📞 Phone: {{ fm.phone|default:"--" }}</div>
+                <p style="margin: 2px 0;">🎂 DOB: {{ fm.dob|date:"d M, Y"|default:"--" }} {% if fm.dob %}<strong>(Age: {{ fm.age }} Yrs)</strong>{% endif %}</p>
+                <p style="margin: 2px 0;">📞 Phone: {{ fm.phone|default:"--" }}</p>
                 
                 {% if fm.marital_status == 'married' %}
                 <div style="margin-top: 8px; padding-top: 5px; border-top: 1px dashed #ccc; color: #bf953f;">
                     💍 <strong>Spouse:</strong> {{ fm.spouse_name|default:"--" }}<br>
-                    📞 <strong>Spouse Phone:</strong> {{ fm.spouse_phone|default:"--" }}<br>
-                    🎂 <strong>Spouse DOB:</strong> {{ fm.spouse_dob|date:"d M, Y"|default:"--" }}
-                    {% if fm.spouse_dob %}
-                        <strong>(Age: {{ fm.spouse_age }} Yrs)</strong>
-                    {% endif %}
+                    🎂 <strong>Spouse DOB:</strong> {{ fm.spouse_dob|date:"d M, Y"|default:"--" }} {% if fm.spouse_dob %}<strong>(Age: {{ fm.spouse_age }} Yrs)</strong>{% endif %}
                 </div>
                 {% endif %}
             </div>
@@ -202,11 +185,11 @@
         {% endfor %}
     </div>
 
-    <div class="action-container" style="text-align: center; margin-top: 30px;">
-        <button onclick="checkPassword('{{ member.id }}', '{{ member.pin }}')" class="btn-edit-profile" style="width: 100%; background: #bf953f; color: white; padding: 15px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; font-size: 1rem;">
+    <div style="text-align: center; margin-top: 30px;">
+        <button onclick="checkPassword('{{ member.id }}', '{{ member.pin }}')" style="width: 100%; background: #bf953f; color: white; padding: 15px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer;">
             ⚙️ Edit Profile Details
         </button>
-        <a href="/" class="back-link" style="display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 14px;">← Back to Directory</a>
+        <a href="/" style="display: block; margin-top: 20px; color: #888; text-decoration: none;">← Back to Directory</a>
     </div>
 </div>
 
@@ -214,18 +197,12 @@
     function checkPassword(memberId, correctPassword) {
         var userPass = prompt("Please enter your Security PIN to edit:");
         if (userPass == null) return; 
-        
         if (userPass === correctPassword) {
             window.location.href = "/edit/" + memberId + "/";
         } else {
             alert("Wrong PIN! Access Denied.");
         }
     }
-
-    setTimeout(function() {
-        const msg = document.querySelector('[style*="background: #e7f4e4"]');
-        if (msg) msg.style.display = 'none';
-    }, 3000);
 </script>
 </body>
 </html>
