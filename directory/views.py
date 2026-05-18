@@ -144,7 +144,7 @@ def save_member(request):
                     spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
                 )
 
-        return redirect('profile_view', id=member.id)
+        return redirect('profile_view', member_id=member.id)
     
     return redirect('register') 
 
@@ -202,7 +202,7 @@ def edit_profile(request, member_id):
                     spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
                 )
 
-        return redirect('profile_view', id=member.id)
+        return redirect('profile_view', member_id=member.id)
 
     return render(request, 'register.html', {
         'member': member, 
