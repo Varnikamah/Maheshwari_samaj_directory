@@ -8,7 +8,10 @@ from django.db.models import Q
 from django.contrib import messages
 def smart_login(request):
     if request.method == "POST":
-        phone = request.POST.get('phone_number', '').strip()
+        print(f"🚨 TOTAL FORM DATA RECEIVED = {dict(request.POST)}")
+        
+        phone = request.POST.get('phone_number') or request.POST.get('phone') or ''
+        phone = phone.strip()
         
         print(f"👉 DEBUG 1: Input Phone from Form = '{phone}'")
 
@@ -19,20 +22,36 @@ def smart_login(request):
         print(f"👉 DEBUG 2: Cleaned 10-Digit Phone = '{clean_phone}'")
 
         if clean_phone:
-            member = Member.objects.filter(phone_number__endswith=clean_phone).first()
+            member = Member.objects.filter(phone_number__contains=clean_phone).first() or \
+                     Member.objects.filter(login_number__contains=clean_phone).first()
             
             print(f"👉 DEBUG 3: Database Query Result = {member}")
             if member:
                 print(f"👉 DEBUG 4: Matching Member Found! ID: {member.id}, Name: {member.name}")
                 return redirect('profile_view', member_id=member.id)
             
-        request.session['temp_phone'] = clean_phone
-        return redirect('register')
+            all_members = Member.objects.all()
+            for m in all_members:
+                db_phone = ''.join(filter(str.isdigit, m.phone_number or ''))
+                db_login = ''.join(filter(str.isdigit, m.login_number or ''))
+                
+                if clean_phone in db_phone or clean_phone in db_login:
+                    print(f"🎯 BACKUP MATCH FOUND! ID: {m.id}, Name: {m.name}")
+                    return redirect('profile_view', member_id=m.id)
+            
+        return redirect(f'/register/?phone={clean_phone}')
             
     return render(request, 'home.html')
+
+
 def register(request):
-    areas = Area.objects.all()
-    return render(request, 'register.html', {'areas': areas})
+    try:
+        areas = Area.objects.all()
+        temp_phone = request.GET.get('phone', '')
+        
+        return render(request, 'register.html', {'areas': areas, 'temp_phone': temp_phone})
+    except Exception as e:
+        return HttpResponse(f"Register View Crashed: {str(e)}<br><pre>{traceback.format_exc()}</pre>", status=500)
 def update_member(request, id):
     member = get_object_or_404(Member, id=id)
     if request.method == "POST":
