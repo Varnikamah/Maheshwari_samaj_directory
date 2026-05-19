@@ -42,8 +42,19 @@ def update_member(request, id):
     member = get_object_or_404(Member, id=id)
     if request.method == "POST":
         member.name = request.POST.get('name')
-        member.phone_number = request.POST.get('phone_number')
-        member.dob = request.POST.get('dob') or None
+        
+        # Phone number cleaning logic (As it is)
+        phone = request.POST.get('phone_number', '').strip()
+        clean_phone = ''.join(filter(str.isdigit, phone))
+        if len(clean_phone) >= 10:
+            clean_phone = clean_phone[-10:]
+        member.phone_number = clean_phone
+        member.login_number = clean_phone
+        
+        # Safe Date handling for Mukhiya
+        dob_val = request.POST.get('dob')
+        member.dob = dob_val if (dob_val and dob_val.strip() != "") else None
+        
         member.marital_status = request.POST.get('marital_status')
         member.gotra = request.POST.get('gotra')
         member.detailed_address = request.POST.get('detailed_address')
@@ -51,13 +62,16 @@ def update_member(request, id):
 
         member.spouse_name = request.POST.get('spouse_name')
         member.spouse_phone = request.POST.get('spouse_phone')
-        member.spouse_dob = request.POST.get('spouse_dob') or None
+        
+        spouse_dob_val = request.POST.get('spouse_dob')
+        member.spouse_dob = spouse_dob_val if (spouse_dob_val and spouse_dob_val.strip() != "") else None
         
         area_id = request.POST.get('area')
         if area_id:
             try:
                 member.area = Area.objects.get(id=area_id)
-            except: pass
+            except: 
+                pass
             
         member.save() 
 
@@ -69,30 +83,38 @@ def update_member(request, id):
         f_sp_phones = request.POST.getlist('member_spouse_phone[]')
         f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
 
-        member.family_members.all().delete()
+        # 🎯 FIX 1: Safe delete using ForeignKey filter
+        FamilyMember.objects.filter(member=member).delete()
 
         for i in range(len(f_names)):
             name_val = f_names[i].strip()
             if name_val:
+                # 🎯 FIX 2: Strict check for empty date strings
+                f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and f_dobs[i].strip() != "") else None
+                f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and f_sp_dobs[i].strip() != "") else None
+
                 FamilyMember.objects.create(
                     member=member,
                     name=name_val,
                     phone=f_phones[i] if i < len(f_phones) else "",
-                    dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
+                    dob=f_dob_val,
                     marital_status=f_status[i] if i < len(f_status) else "unmarried",
                     spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                     spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
+                    spouse_dob=f_sp_dob_val
                 )
                 print(f"DEBUG: Updated and Saved family member {name_val}")
                 
         return redirect('profile_view', member_id=member.id)
-
 def save_member(request):
     if request.method == "POST":
         try:
             name = request.POST.get('name')
             phone_number = request.POST.get('phone_number')
+            phone = request.POST.get('phone_number', '').strip()
+            phone_number = ''.join(filter(str.isdigit, phone))
+            if len(phone_number) >= 10:
+               phone_number = phone_number[-10:]
             dob = request.POST.get('dob')
             if not dob or dob.strip() == "":
                 dob = None
