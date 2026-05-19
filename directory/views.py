@@ -3,6 +3,7 @@ from urllib import request
 import traceback
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Area, Member, FamilyMember
+from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib import messages
 def smart_login(request):
@@ -41,71 +42,79 @@ def register(request):
 def update_member(request, id):
     member = get_object_or_404(Member, id=id)
     if request.method == "POST":
-        member.name = request.POST.get('name')
-        
-        # Phone number cleaning logic (As it is)
-        phone = request.POST.get('phone_number', '').strip()
-        clean_phone = ''.join(filter(str.isdigit, phone))
-        if len(clean_phone) >= 10:
-            clean_phone = clean_phone[-10:]
-        member.phone_number = clean_phone
-        member.login_number = clean_phone
-        
-        # Safe Date handling for Mukhiya
-        dob_val = request.POST.get('dob')
-        member.dob = dob_val if (dob_val and dob_val.strip() != "") else None
-        
-        member.marital_status = request.POST.get('marital_status')
-        member.gotra = request.POST.get('gotra')
-        member.detailed_address = request.POST.get('detailed_address')
-        member.pin = request.POST.get('pin')
-
-        member.spouse_name = request.POST.get('spouse_name')
-        member.spouse_phone = request.POST.get('spouse_phone')
-        
-        spouse_dob_val = request.POST.get('spouse_dob')
-        member.spouse_dob = spouse_dob_val if (spouse_dob_val and spouse_dob_val.strip() != "") else None
-        
-        area_id = request.POST.get('area')
-        if area_id:
-            try:
-                member.area = Area.objects.get(id=area_id)
-            except: 
-                pass
+        try:
+            member.name = request.POST.get('name')
             
-        member.save() 
+            # Phone cleaning logic
+            phone = request.POST.get('phone_number', '').strip()
+            clean_phone = ''.join(filter(str.isdigit, phone))
+            if len(clean_phone) >= 10:
+                clean_phone = clean_phone[-10:]
+            
+            member.phone_number = clean_phone
+            member.login_number = clean_phone
+            
+            # Safe Date handling
+            dob_val = request.POST.get('dob')
+            member.dob = dob_val if (dob_val and dob_val.strip() != "") else None
+            
+            member.marital_status = request.POST.get('marital_status')
+            member.gotra = request.POST.get('gotra')
+            member.detailed_address = request.POST.get('detailed_address')
+            member.pin = request.POST.get('pin')
 
-        f_names = request.POST.getlist('member_name[]')
-        f_phones = request.POST.getlist('member_phone[]')
-        f_dobs = request.POST.getlist('member_dob[]')
-        f_status = request.POST.getlist('member_married[]')
-        f_sp_names = request.POST.getlist('member_spouse_name[]')
-        f_sp_phones = request.POST.getlist('member_spouse_phone[]')
-        f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
-
-        # 🎯 FIX 1: Safe delete using ForeignKey filter
-        FamilyMember.objects.filter(member=member).delete()
-
-        for i in range(len(f_names)):
-            name_val = f_names[i].strip()
-            if name_val:
-                # 🎯 FIX 2: Strict check for empty date strings
-                f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and f_dobs[i].strip() != "") else None
-                f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and f_sp_dobs[i].strip() != "") else None
-
-                FamilyMember.objects.create(
-                    member=member,
-                    name=name_val,
-                    phone=f_phones[i] if i < len(f_phones) else "",
-                    dob=f_dob_val,
-                    marital_status=f_status[i] if i < len(f_status) else "unmarried",
-                    spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
-                    spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dob_val
-                )
-                print(f"DEBUG: Updated and Saved family member {name_val}")
+            member.spouse_name = request.POST.get('spouse_name')
+            member.spouse_phone = request.POST.get('spouse_phone')
+            
+            spouse_dob_val = request.POST.get('spouse_dob')
+            member.spouse_dob = spouse_dob_val if (spouse_dob_val and spouse_dob_val.strip() != "") else None
+            
+            area_id = request.POST.get('area')
+            if area_id:
+                try:
+                    member.area = Area.objects.get(id=area_id)
+                except: 
+                    pass
                 
-        return redirect('profile_view', member_id=member.id)
+            member.save() 
+
+            # Family members handling
+            f_names = request.POST.getlist('member_name[]')
+            f_phones = request.POST.getlist('member_phone[]')
+            f_dobs = request.POST.getlist('member_dob[]')
+            f_status = request.POST.getlist('member_married[]')
+            f_sp_names = request.POST.getlist('member_spouse_name[]')
+            f_sp_phones = request.POST.getlist('member_spouse_phone[]')
+            f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
+
+            FamilyMember.objects.filter(member=member).delete()
+
+            for i in range(len(f_names)):
+                name_val = f_names[i].strip()
+                if name_val:
+                    f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and f_dobs[i].strip() != "") else None
+                    f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and f_sp_dobs[i].strip() != "") else None
+
+                    FamilyMember.objects.create(
+                        member=member,
+                        name=name_val,
+                        phone=f_phones[i] if i < len(f_phones) else "",
+                        dob=f_dob_val,
+                        marital_status=f_status[i] if i < len(f_status) else "unmarried",
+                        spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
+                        spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
+                        spouse_dob=f_sp_dob_val
+                    )
+            
+            return redirect('profile_view', member_id=member.id)
+
+        except Exception as e:
+            # 🔥 Agar crash hua, toh ganda 500 page nahi aayega, direct error screen par dikhega!
+            print("🔴🔴 UPDATE FUNCTION CRASHED 🔴🔴")
+            print(traceback.format_exc())
+            return HttpResponse(f"<h2>Update Error Detailing:</h2><pre>{traceback.format_exc()}</pre>", status=500)
+            
+    return redirect('profile_view', member_id=member.id)
 def save_member(request):
     if request.method == "POST":
         try:
