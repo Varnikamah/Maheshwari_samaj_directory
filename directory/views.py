@@ -19,13 +19,12 @@ def smart_login(request):
         print(f"👉 DEBUG 2: Cleaned 10-Digit Phone = '{clean_phone}'")
 
         if clean_phone:
-            member = Member.objects.filter(phone_number__icontains=clean_phone).first() or \
-                     Member.objects.filter(login_number__icontains=clean_phone).first()
+            member = Member.objects.filter(phone_number__endswith=clean_phone).first()
             
             print(f"👉 DEBUG 3: Database Query Result = {member}")
             if member:
-                print(f"👉 DEBUG 4: Matching Member Found! ID: {member.id}, Name: {member.name}, Phone: {member.phone_number}")
-                return redirect('profile_view', member_id=member.id) # 'member_id' variable bilkul sahi hai tumhara
+                print(f"👉 DEBUG 4: Matching Member Found! ID: {member.id}, Name: {member.name}")
+                return redirect('profile_view', member_id=member.id)
             
         request.session['temp_phone'] = clean_phone
         return redirect('register')
