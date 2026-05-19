@@ -58,16 +58,20 @@ def update_member(request, id):
         try:
             member.name = request.POST.get('name')
             
-            # Phone cleaning logic
             phone = request.POST.get('phone_number', '').strip()
             clean_phone = ''.join(filter(str.isdigit, phone))
             if len(clean_phone) >= 10:
                 clean_phone = clean_phone[-10:]
             
+            if clean_phone:
+                duplicate_exists = Member.objects.filter(phone_number=clean_phone).exclude(id=id).exists() or \
+                                   Member.objects.filter(login_number=clean_phone).exclude(id=id).exists()
+                if duplicate_exists:
+                    return HttpResponse(f"<h2>Update Error:</h2><p>This phone number ({clean_phone}) is already registered with another member!</p>", status=400)
+            
             member.phone_number = clean_phone
             member.login_number = clean_phone
             
-            # Safe Date handling
             dob_val = request.POST.get('dob')
             member.dob = dob_val if (dob_val and dob_val.strip() != "") else None
             
@@ -91,7 +95,6 @@ def update_member(request, id):
                 
             member.save() 
 
-            # Family members handling
             f_names = request.POST.getlist('member_name[]')
             f_phones = request.POST.getlist('member_phone[]')
             f_dobs = request.POST.getlist('member_dob[]')
@@ -122,7 +125,6 @@ def update_member(request, id):
             return redirect('profile_view', member_id=member.id)
 
         except Exception as e:
-            # 🔥 Agar crash hua, toh ganda 500 page nahi aayega, direct error screen par dikhega!
             print("🔴🔴 UPDATE FUNCTION CRASHED 🔴🔴")
             print(traceback.format_exc())
             return HttpResponse(f"<h2>Update Error Detailing:</h2><pre>{traceback.format_exc()}</pre>", status=500)
