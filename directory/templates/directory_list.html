@@ -79,12 +79,18 @@
             {% endif %}
         </form>
     </div>
+<div class="list-wrapper">
+    {% for member in members %}
+        
+        {% ifchanged member.area.id %}
+            <div style="background: #fdfaf3; color: #bf953f; border-left: 4px solid #bf953f; padding: 8px 15px; margin: 20px 0 12px 0; font-weight: bold; font-size: 1rem; border-radius: 0 8px 8px 0; display: flex; align-items: center; gap: 8px;">
+                📍 {{ member.area.name }}
+            </div>
+        {% endifchanged %}
 
-    <div class="list-wrapper">
-        {% for member in members %}
         <a href="{% url 'profile_view' member.id %}" style="text-decoration: none; color: inherit; display: block; margin-bottom: 12px;">
             
-            <div class="member-item" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;">
+            <div class="member-item" style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; background: white;">
                 
                 <span style="position: absolute; top: 5px; left: 15px; color: #888; font-size: 0.75rem; font-weight: bold;">
                     #{{ forloop.counter }}
@@ -110,15 +116,15 @@
 
             </div>
         </a>
-        {% empty %}
-            <div style="text-align: center; color: #95a5a6; margin-top: 50px;">
-                <p>Koi sadasya nahi mila.</p>
-                {% if query %}
-                    <a href="{% url 'directory_view' %}" style="color: #bf953f; text-decoration: none; font-weight: bold;">Puri list dekhein</a>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
+    {% empty %}
+        <div style="text-align: center; color: #95a5a6; margin-top: 50px;">
+            <p>Koi sadasya nahi mila.</p>
+            {% if query %}
+                <a href="{% url 'directory_view' %}" style="color: #bf953f; text-decoration: none; font-weight: bold;">Puri list dekhein</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
 
 </div>
 

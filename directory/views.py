@@ -285,12 +285,11 @@ def directory_view(request):
     if query:
         members = Member.objects.filter(
             Q(name__icontains=query) | Q(phone_number__icontains=query)
-        ).order_by('name')
+        ).order_by('area__name', 'name')
     else:
-        members = Member.objects.all().order_by('name')
+        members = Member.objects.all().order_by('area__name', 'name')
 
     return render(request, 'directory_list.html', {'members': members, 'query': query})
-
 def profile_view(request, member_id):
     from django.shortcuts import get_object_or_404
     member = get_object_or_404(Member, id=member_id)
