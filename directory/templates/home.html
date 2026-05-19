@@ -104,13 +104,14 @@
         <form method="POST" action="{% url 'home' %}">
             {% csrf_token %}
             <input type="tel" 
-                   name="phone"
+                   name="phone_number" 
                    placeholder="Enter your phone number" 
                    maxlength="10" 
                    pattern="\d{10}" 
                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" 
                    required>
-            <br>
+              <br>
+
             <button type="submit" class="btn">Next</button>
             <div style="margin-top: 20px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
     <a href="/directory-list/" style="display: block; width: 100%; padding: 12px; border: 2px solid #bf953f; color: #bf953f; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 14px; box-sizing: border-box; transition: 0.3s;">
