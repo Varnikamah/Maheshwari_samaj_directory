@@ -52,20 +52,24 @@ def register(request):
         return render(request, 'register.html', {'areas': areas, 'temp_phone': temp_phone})
     except Exception as e:
         return HttpResponse(f"Register View Crashed: {str(e)}<br><pre>{traceback.format_exc()}</pre>", status=500)
-def update_member(request, id):
-    member = get_object_or_404(Member, id=id)
+def update_member(request, id=None, member_id=None):
+    target_id = id or member_id
+    
+    member = get_object_or_404(Member, id=target_id)
+    
     if request.method == "POST":
         try:
             member.name = request.POST.get('name')
             
+            # Phone cleaning logic
             phone = request.POST.get('phone_number', '').strip()
             clean_phone = ''.join(filter(str.isdigit, phone))
             if len(clean_phone) >= 10:
                 clean_phone = clean_phone[-10:]
             
             if clean_phone:
-                duplicate_exists = Member.objects.filter(phone_number=clean_phone).exclude(id=id).exists() or \
-                                   Member.objects.filter(login_number=clean_phone).exclude(id=id).exists()
+                duplicate_exists = Member.objects.filter(phone_number=clean_phone).exclude(id=target_id).exists() or \
+                                   Member.objects.filter(login_number=clean_phone).exclude(id=target_id).exists()
                 if duplicate_exists:
                     return HttpResponse(f"<h2>Update Error:</h2><p>This phone number ({clean_phone}) is already registered with another member!</p>", status=400)
             
