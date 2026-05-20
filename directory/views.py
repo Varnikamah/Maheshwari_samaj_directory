@@ -202,6 +202,7 @@ def save_member(request):
             f_sp_phones = request.POST.getlist('member_spouse_phone[]')
             f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
             f_occupations = request.POST.getlist('member_occupation[]')
+            f_spouse_occupations = request.POST.getlist('member_spouse_occupation[]')
 
             for i in range(len(f_names)):
                 name_val = f_names[i].strip()
@@ -209,7 +210,9 @@ def save_member(request):
                     f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
                     f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
                     occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
-
+                    sp_occ_val = ""
+                    if i < len(f_spouse_occupations) and f_spouse_occupations[i]:
+                         sp_occ_val = f_spouse_occupations[i].strip()
                     FamilyMember.objects.create(
                         member=member,
                         name=name_val,
@@ -219,7 +222,8 @@ def save_member(request):
                         spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                         spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
                         spouse_dob=f_sp_dob_val,
-                        occupation=occ_val
+                        occupation=occ_val,
+                        spouse_occupation=sp_occ_val
                     )
 
             return redirect('profile_view', member_id=member.id)
@@ -269,22 +273,33 @@ def edit_profile(request, member_id):
         f_names = request.POST.getlist('member_name[]')
         f_phones = request.POST.getlist('member_phone[]')
         f_dobs = request.POST.getlist('member_dob[]')
+        f_status = request.POST.getlist('member_married[]') 
+        f_sp_names = request.POST.getlist('member_spouse_name[]')
+        f_sp_phones = request.POST.getlist('member_spouse_phone[]')
+        f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
         f_occupations = request.POST.getlist('member_occupation[]')
         f_spouse_occupations = request.POST.getlist('member_spouse_occupation[]')
 
         for i in range(len(f_names)):
             if f_names[i].strip():
-                val_spouse_occ = f_spouse_occupations[i].strip() if i < len(f_spouse_occupations) else ""
-               
+                # Safe access logic
+                f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
+                f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
+                
+                sp_occ_val = f_spouse_occupations[i].strip() if (i < len(f_spouse_occupations) and f_spouse_occupations[i]) else ""
+
                 FamilyMember.objects.create(
                     member=member,
                     name=f_names[i].strip(),
                     phone=f_phones[i] if i < len(f_phones) else "",
-                    dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
+                    dob=f_dob_val,
+                    marital_status=f_status[i] if i < len(f_status) else "unmarried",
+                    spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
+                    spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
+                    spouse_dob=f_sp_dob_val,
                     occupation=f_occupations[i].strip() if i < len(f_occupations) else "",
-                    spouse_occupation=val_spouse_occ
+                    spouse_occupation=sp_occ_val
                 )
-        
         return redirect('profile_view', member_id=member.id)
 
     return render(request, 'register.html', {
