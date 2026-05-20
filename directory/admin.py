@@ -322,7 +322,7 @@ class FamilyMemberInline(admin.TabularInline):
     
     fields = [
         'name', 'phone', 'dob', 'display_age', 'occupation', 
-        'marital_status', 'spouse_name', 'spouse_dob', 'display_spouse_age'
+        'marital_status', 'spouse_name', 'spouse_dob', 'display_spouse_age', 'spouse_occupation'
     ]
 
     def display_age(self, obj):

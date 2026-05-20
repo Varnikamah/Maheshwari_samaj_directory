@@ -271,6 +271,7 @@ def edit_profile(request, member_id):
         f_phones = request.POST.getlist('member_phone[]')
         f_dobs = request.POST.getlist('member_dob[]')
         f_occupations = request.POST.getlist('member_occupation[]')
+        f_spouse_occupations = request.POST.getlist('member_spouse_occupation[]')
 
         for i in range(len(f_names)):
             if f_names[i].strip():
@@ -279,7 +280,8 @@ def edit_profile(request, member_id):
                     name=f_names[i].strip(),
                     phone=f_phones[i] if i < len(f_phones) else "",
                     dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
-                    occupation=f_occupations[i].strip() if i < len(f_occupations) else ""
+                    occupation=f_occupations[i].strip() if i < len(f_occupations) else "",
+                    spouse_occupation=f_spouse_occupations[i].strip() if i < len(f_spouse_occupations) else ""
                 )
         
         return redirect('profile_view', member_id=member.id)

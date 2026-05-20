@@ -90,6 +90,7 @@ class FamilyMember(models.Model):
     spouse_dob = models.DateField(null=True, blank=True)
 
     occupation = models.CharField(max_length=100, blank=True, null=True)
+    spouse_occupation = models.CharField(max_length=200, blank=True, null=True)
 
     @property
     def age(self):
