@@ -353,7 +353,7 @@ class FamilyMemberInline(admin.TabularInline):
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
     list_display = [
-        'registration_no', 'name', 'phone_number', 'head_occupation',
+        'registration_no', 'name', 'phone_number','pin', 'head_occupation',
         'spouse_name', 'spouse_occupation',                           
         'get_head_age', 'get_family_members', 'area', 'gotra'
     ]
