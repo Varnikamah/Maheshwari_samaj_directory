@@ -32,7 +32,7 @@
 <div class="card">
     <div class="card-header"><h2>Member Registration</h2></div>
     <div class="card-body">
-        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}" method="POST">
+        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}{% endif %}" method="POST">
             {% csrf_token %}
 
             <div class="section-box">
@@ -170,7 +170,6 @@
         document.getElementById('head_full_info').style.display = isHead ? 'none' : 'block';
     }
 
-    // 🌟 NEW: JavaScript function mein occupation input box jod diya hai dynamic rows ke liye
     function addFamilyRow() {
         const id = Date.now();
         const html = `
