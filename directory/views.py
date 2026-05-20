@@ -148,7 +148,7 @@ def save_member(request):
             phone = request.POST.get('phone_number', '').strip()
             phone_number = ''.join(filter(str.isdigit, phone))
             if len(phone_number) >= 10:
-               phone_number = phone_number[-10:]
+                phone_number = phone_number[-10:]
             dob = request.POST.get('dob')
             if not dob or dob.strip() == "":
                 dob = None
@@ -160,6 +160,10 @@ def save_member(request):
             spouse_dob = request.POST.get('spouse_dob')
             if not spouse_dob or spouse_dob.strip() == "":
                 spouse_dob = None
+            
+            # 🌟 NEW: Form se dono occupations ko pehle variables mein nikal lo
+            head_occupation_val = request.POST.get('head_occupation') or ""
+            spouse_occupation_val = request.POST.get('spouse_occupation') or ""
             
             gotra = request.POST.get('gotra')
             detailed_address = request.POST.get('detailed_address')
@@ -180,6 +184,8 @@ def save_member(request):
                 spouse_name=spouse_name,
                 spouse_phone=spouse_phone,
                 spouse_dob=spouse_dob,
+                head_occupation=head_occupation_val,    # 🌟 NEW: Mukhiya ka kaam save hua
+                spouse_occupation=spouse_occupation_val, # 🌟 NEW: Spouse ka kaam save hua
                 gotra=gotra,
                 detailed_address=detailed_address,
                 pin=pin,
@@ -194,18 +200,13 @@ def save_member(request):
             f_sp_names = request.POST.getlist('member_spouse_name[]')
             f_sp_phones = request.POST.getlist('member_spouse_phone[]')
             f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
-            
-            # 🌟 NEW: Form se saare members ka occupation list uthao
             f_occupations = request.POST.getlist('member_occupation[]')
 
             for i in range(len(f_names)):
                 name_val = f_names[i].strip()
                 if name_val:
-                    # Date cleaning for family members
                     f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
                     f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
-
-                    # 🌟 NEW: Index-wise safe cleaning aur matching check
                     occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
 
                     FamilyMember.objects.create(
@@ -217,19 +218,15 @@ def save_member(request):
                         spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                         spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
                         spouse_dob=f_sp_dob_val,
-                        
-                        # 🌟 NEW: Database mein naya occupation field yahan save hoga
                         occupation=occ_val
                     )
 
             return redirect('profile_view', member_id=member.id)
             
         except Exception as e:
-            # 🔥 YEH LINE ASLI ERROR KO RENDER LOGS MEIN ZABARDASTI PRINT KAREGI
             import traceback
             print("🔴🔴 BHYANKAR BACKEND ERROR DETECTED 🔴🔴")
             print(traceback.format_exc())
-            # Taki screen par 500 error ke bajay error text dikh jaye testing ke liye
             from django.http import HttpResponse
             return HttpResponse(f"Backend Crashed: {str(e)}<br><pre>{traceback.format_exc()}</pre>", status=500)
     
@@ -241,6 +238,7 @@ def edit_profile(request, member_id):
     if request.method == "POST":
         member.name = request.POST.get('name')
         member.phone_number = request.POST.get('phone_number')
+        member.head_occupation = request.POST.get('head_occupation') or ""     
         member.pin = request.POST.get('pin')
         member.dob = request.POST.get('dob') or None
         member.marital_status = request.POST.get('marital_status')
@@ -248,7 +246,7 @@ def edit_profile(request, member_id):
         member.spouse_name = request.POST.get('spouse_name')
         member.spouse_phone = request.POST.get('spouse_phone')
         member.spouse_dob = request.POST.get('spouse_dob') or None
-        
+        member.spouse_occupation = request.POST.get('spouse_occupation') or "" 
         member.gotra = request.POST.get('gotra')
         member.detailed_address = request.POST.get('detailed_address')
         

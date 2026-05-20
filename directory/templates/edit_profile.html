@@ -37,16 +37,28 @@
                 <div id="head_full_info" style="display: {% if member.is_head %}none{% else %}block{% endif %}; margin-top: 15px; border-top: 1px solid #bcdffb; padding-top: 10px;">
                     <p style="font-weight: bold; color: #0050b3; font-size: 14px;">Mukhiya Ki Details</p>
                     <input type="text" name="head_name" placeholder="Mukhiya Name" value="{{ member.head_name }}" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px;">
+                    
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <input type="tel" name="head_phone" placeholder="Mukhiya Phone" value="{{ member.head_phone }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
                         <input type="date" name="head_dob" value="{{ member.head_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
                     </div>
                     
+                    <div style="margin-top: 10px; margin-bottom: 15px;">
+                        <label style="font-size:13px; color:#555;">Mukhiya Occupation / Current Status:</label>
+                        <input type="text" name="head_occupation" value="{{ member.head_occupation|default:'' }}" placeholder="e.g., Business / Job / Retired" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    
                     <label style="display:block; margin-top:10px; font-size:14px;">Mukhiya Spouse Details:</label>
                     <input type="text" name="head_spouse_name" placeholder="Spouse Name" value="{{ member.head_spouse_name }}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                    
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
                         <input type="tel" name="head_spouse_phone" placeholder="Spouse Phone" value="{{ member.head_spouse_phone }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
                         <input type="date" name="head_spouse_dob" value="{{ member.head_spouse_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <label style="font-size:13px; color:#555;">Spouse Occupation / Current Status:</label>
+                        <input type="text" name="spouse_occupation" value="{{ member.spouse_occupation|default:'' }}" placeholder="e.g., Homemaker / Teacher / Business" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
                     </div>
                 </div>
             </div>
@@ -97,7 +109,6 @@ function toggleHeadSection() {
     document.getElementById('head_full_info').style.display = isHeadNo ? 'block' : 'none';
 }
 
-// 🌟 NEW: JavaScript function ko badal diya taaki naya row add karte waqt bhi occupation ka dabba aaye
 function addMemberRow() {
     const container = document.getElementById('family-members-container');
     const div = document.createElement('div');

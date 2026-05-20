@@ -353,19 +353,19 @@ class FamilyMemberInline(admin.TabularInline):
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
     list_display = [
-        'registration_no', 'name', 'phone_number', 'pin', 
-        'get_head_age', 'spouse_name', 'get_head_spouse_age', 
-        'get_family_members', 'area', 'gotra', 'marital_status'
+        'registration_no', 'name', 'phone_number', 'head_occupation',
+        'spouse_name', 'spouse_occupation',                           
+        'get_head_age', 'get_family_members', 'area', 'gotra'
     ]
     ordering = ['registration_no']
     readonly_fields = ['registration_no', 'get_head_age', 'get_head_spouse_age']
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'phone_number', 'dob', 'get_head_age', 'marital_status', 'pin', 'is_head')
+            'fields': ('name', 'phone_number', 'dob', 'head_occupation', 'get_head_age', 'marital_status', 'pin', 'is_head')
         }),
         ('Spouse Details', {
-            'fields': ('spouse_name', 'spouse_phone', 'spouse_dob', 'get_head_spouse_age')
+            'fields': ('spouse_name', 'spouse_phone', 'spouse_dob', 'spouse_occupation', 'get_head_spouse_age')
         }),
         ('Address & Location', {
             'fields': ('gotra', 'area', 'detailed_address')
@@ -394,7 +394,6 @@ class MemberAdmin(admin.ModelAdmin):
             return ", ".join([m.name for m in members])
         return "--"
     get_family_members.short_description = 'Family Members'
-
 
 @admin.register(FamilyMember)
 class FamilyMemberAdmin(admin.ModelAdmin):

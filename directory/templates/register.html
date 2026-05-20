@@ -50,6 +50,10 @@
                         <input type="date" name="dob" onkeydown="return false" class="dob-field" value="{{ member.dob|date:'Y-m-d' }}">
                     </div>
                 </div>
+                <div style="margin-top: 10px;">
+                       <label>Mukhiya Occupation / Current Status:</label>
+                       <input type="text" name="head_occupation" value="{{ member.head_occupation|default:'' }}" placeholder="e.g., Business / Job / Retired" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
 
                 <label style="margin-top: 10px; display: block;">Marital Status:</label>
                 <select name="marital_status" id="self_status" onchange="toggleSpouse('self_status', 'self_spouse_div')" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
@@ -69,6 +73,10 @@
                         <div>
                             <label>Spouse DOB:</label>
                             <input type="date" name="spouse_dob" onkeydown="return false" class="dob-field" value="{{ member.spouse_dob|date:'Y-m-d' }}">
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>Spouse Occupation / Current Status:</label>
+                            <input type="text" name="spouse_occupation" value="{{ member.spouse_occupation|default:'' }}" placeholder="e.g., Homemaker / Business / Teacher" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
                         </div>
                     </div>
                 </div>
