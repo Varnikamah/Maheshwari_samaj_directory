@@ -282,7 +282,7 @@ def edit_profile(request, member_id):
         
         return redirect('profile_view', member_id=member.id)
 
-    return render(request, 'edit_profile.html', {
+    return render(request, 'register.html', {
         'member': member, 
         'areas': areas, 
         'edit_mode': True
