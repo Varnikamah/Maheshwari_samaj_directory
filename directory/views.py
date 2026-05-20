@@ -107,6 +107,8 @@ def update_member(request, id=None, member_id=None):
             f_sp_phones = request.POST.getlist('member_spouse_phone[]')
             f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
 
+            f_occupations = request.POST.getlist('member_occupation[]')
+
             FamilyMember.objects.filter(member=member).delete()
 
             for i in range(len(f_names)):

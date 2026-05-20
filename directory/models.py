@@ -82,9 +82,13 @@ class FamilyMember(models.Model):
     phone = models.CharField(max_length=15, blank=True, null=True)
     dob = models.DateField(null=True, blank=True)
     marital_status = models.CharField(max_length=20, default='unmarried')
+    is_out_of_station = models.BooleanField(default=False)
+    description = models.TextField(blank=True, null=True)
     spouse_name = models.CharField(max_length=100, blank=True, null=True)
     spouse_phone = models.CharField(max_length=15, null=True, blank=True)
     spouse_dob = models.DateField(null=True, blank=True)
+
+    occupation = models.TextField(blank=True, null=True)
 
     @property
     def age(self):

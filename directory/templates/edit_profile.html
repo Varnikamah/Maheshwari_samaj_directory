@@ -6,7 +6,7 @@
         
         <h2 style="color: #bf953f; text-align: center; margin-bottom: 20px;">Edit Profile</h2>
 
-        <form action="{% url 'update_member' member.id %}" method="POST">
+        <form action="/final-update/{{ member.id }}/" method="POST">
             {% csrf_token %}
 
             <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 10px;">
@@ -55,15 +55,20 @@
                 <p style="font-weight: bold; color: #bf953f;">Any Other Family Members?</p>
                 <div id="family-members-container">
                     {% for fm in member.family_members.all %}
-                    <div class="family-member-row" style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px; position:relative;">
+                    <div class="family-member-row" style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:12px; position:relative; border: 1px solid #e0e0e0;">
                         <input type="text" name="member_name[]" value="{{ fm.name }}" placeholder="Name" style="width:80%; padding:5px; margin-bottom:5px;">
                         <input type="date" name="member_dob[]" value="{{ fm.dob|date:'Y-m-d' }}" style="width:45%; padding:5px;">
                         <input type="tel" name="member_phone[]" value="{{ fm.phone }}" placeholder="Phone" style="width:45%; padding:5px;">
-                        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer;">✖ Remove</button>
+                        
+                        <div style="margin-top: 8px;">
+                            <input type="text" name="member_occupation[]" value="{{ fm.occupation|default_if_none:'' }}" placeholder="Occupation / Current Status (e.g. Student - Kota / Job - Pune)" style="width: 95%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        
+                        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer; position: absolute; top: 10px; right: 10px; font-weight: bold;">✖ Remove</button>
                     </div>
                     {% endfor %}
                 </div>
-                <button type="button" onclick="addMemberRow()" style="background:#eee; border:1px dashed #ccc; width:100%; padding:10px; cursor:pointer;">+ Add Family Member</button>
+                <button type="button" onclick="addMemberRow()" style="background:#eee; border:1px dashed #ccc; width:100%; padding:10px; cursor:pointer; font-weight: bold; border-radius: 5px;">+ Add Family Member</button>
             </div>
 
             <div style="margin-bottom: 25px;">
@@ -71,9 +76,9 @@
                 <input type="text" name="gotra" value="{{ member.gotra }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
                 
                 <div style="margin-top:10px;">
-               <label style="display:block; font-size:14px;">Area PIN Code:</label>
-               <input type="text" name="pin" value="{{ member.pin }}" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
-               </div>
+                    <label style="display:block; font-size:14px;">Area PIN Code:</label>
+                    <input type="text" name="pin" value="{{ member.pin }}" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                </div>
 
                 <label style="display:block; margin-top:10px; font-size:14px;">Detailed Address:</label>
                 <textarea name="detailed_address" rows="3" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">{{ member.detailed_address }}</textarea>
@@ -92,16 +97,20 @@ function toggleHeadSection() {
     document.getElementById('head_full_info').style.display = isHeadNo ? 'block' : 'none';
 }
 
+// 🌟 NEW: JavaScript function ko badal diya taaki naya row add karte waqt bhi occupation ka dabba aaye
 function addMemberRow() {
     const container = document.getElementById('family-members-container');
     const div = document.createElement('div');
     div.className = 'family-member-row';
-    div.style = "background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px;";
+    div.style = "background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:12px; position:relative; border: 1px solid #e0e0e0;";
     div.innerHTML = `
         <input type="text" name="member_name[]" placeholder="Name" style="width:80%; padding:5px; margin-bottom:5px;">
         <input type="date" name="member_dob[]" style="width:45%; padding:5px;">
         <input type="tel" name="member_phone[]" placeholder="Phone" style="width:45%; padding:5px;">
-        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer;">✖</button>
+        <div style="margin-top: 8px;">
+            <input type="text" name="member_occupation[]" placeholder="Occupation / Current Status (e.g. Student - Kota / Job - Pune)" style="width: 95%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer; position: absolute; top: 10px; right: 10px; font-weight: bold;">✖</button>
     `;
     container.appendChild(div);
 }
@@ -109,18 +118,17 @@ function addMemberRow() {
 
 <script>
     function toggleSelfSpouse() {
-        const status = document.getElementById('self_status').value;
-        document.getElementById('self_spouse_div').style.display = (status === 'married') ? 'block' : 'none';
-    }
-
-    function toggleHeadSection() {
-        const isHeadNo = document.getElementById('is_head_no').checked;
-        document.getElementById('head_full_info').style.display = isHeadNo ? 'block' : 'none';
+        const status = document.getElementById('self_status');
+        if(status) {
+            document.getElementById('self_spouse_div').style.display = (status.value === 'married') ? 'block' : 'none';
+        }
     }
 
     function toggleHeadSpouse() {
-        const status = document.getElementById('head_status').value;
-        document.getElementById('head_spouse_div').style.display = (status === 'married') ? 'block' : 'none';
+        const status = document.getElementById('head_status');
+        if(status) {
+            document.getElementById('head_spouse_div').style.display = (status.value === 'married') ? 'block' : 'none';
+        }
     }
 
     window.onload = function() {
