@@ -163,7 +163,6 @@ def save_member(request):
             if not spouse_dob or spouse_dob.strip() == "":
                 spouse_dob = None
             
-            # 🌟 NEW: Form se dono occupations ko pehle variables mein nikal lo
             head_occupation_val = request.POST.get('head_occupation') or ""
             spouse_occupation_val = request.POST.get('spouse_occupation') or ""
             
@@ -186,8 +185,8 @@ def save_member(request):
                 spouse_name=spouse_name,
                 spouse_phone=spouse_phone,
                 spouse_dob=spouse_dob,
-                head_occupation=head_occupation_val,    # 🌟 NEW: Mukhiya ka kaam save hua
-                spouse_occupation=spouse_occupation_val, # 🌟 NEW: Spouse ka kaam save hua
+                head_occupation=head_occupation_val,  
+                spouse_occupation=spouse_occupation_val, 
                 gotra=gotra,
                 detailed_address=detailed_address,
                 pin=pin,

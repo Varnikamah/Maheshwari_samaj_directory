@@ -193,7 +193,12 @@
                 <div style="margin-top: 8px; padding-top: 5px; border-top: 1px dashed #ccc; color: #bf953f;">
                     💍 <strong>Spouse:</strong> {{ fm.spouse_name|default:"--" }}<br>
                     🎂 <strong>Spouse DOB:</strong> {{ fm.spouse_dob|date:"d M, Y"|default:"--" }} {% if fm.spouse_dob %}<strong>(Age: {{ fm.spouse_age }} Yrs)</strong>{% endif %}
-                    <br>💼 <strong>Spouse Status:</strong> {{ fm.spouse_occupation|default:"Not Provided" }}
+                    <p>
+                        DEBUG: Field Check -> {{ fm.spouse_occupation }} 
+                        <br>
+                        Final Output: {{ fm.spouse_occupation|default:"Not Provided" }}
+                    </p>
+                    {% comment %} <br>💼 <strong>Spouse Status:</strong> {{ fm.spouse_occupation|default:"Not Provided" }} {% endcomment %}
                 </div>
                 {% endif %}
             </div>
