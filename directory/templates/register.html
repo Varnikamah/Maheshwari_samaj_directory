@@ -134,6 +134,7 @@
                         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                             <input type="tel" name="member_spouse_phone[]" value="{{ fm.spouse_phone|default:'' }}" placeholder="Spouse Phone" maxlength="10" style="width: 100%;">
                             <input type="date" name="member_spouse_dob[]" class="dob-field" value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
+                            <input type="text" name="member_spouse_occupation[]" value="{{ fm.spouse_occupation|default:'' }}" placeholder="Spouse Occupation" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                         </div>
                     </div>
                 </div>
