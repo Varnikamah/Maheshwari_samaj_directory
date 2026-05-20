@@ -117,6 +117,8 @@ def update_member(request, id=None, member_id=None):
                     f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and f_dobs[i].strip() != "") else None
                     f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and f_sp_dobs[i].strip() != "") else None
 
+                    occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
+
                     FamilyMember.objects.create(
                         member=member,
                         name=name_val,
@@ -125,7 +127,8 @@ def update_member(request, id=None, member_id=None):
                         marital_status=f_status[i] if i < len(f_status) else "unmarried",
                         spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                         spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                        spouse_dob=f_sp_dob_val
+                        spouse_dob=f_sp_dob_val,
+                        occupation=occ_val
                     )
             
             return redirect('profile_view', member_id=member.id)
