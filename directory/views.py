@@ -193,6 +193,9 @@ def save_member(request):
             f_sp_names = request.POST.getlist('member_spouse_name[]')
             f_sp_phones = request.POST.getlist('member_spouse_phone[]')
             f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
+            
+            # 🌟 NEW: Form se saare members ka occupation list uthao
+            f_occupations = request.POST.getlist('member_occupation[]')
 
             for i in range(len(f_names)):
                 name_val = f_names[i].strip()
@@ -200,6 +203,9 @@ def save_member(request):
                     # Date cleaning for family members
                     f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
                     f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
+
+                    # 🌟 NEW: Index-wise safe cleaning aur matching check
+                    occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
 
                     FamilyMember.objects.create(
                         member=member,
@@ -209,13 +215,17 @@ def save_member(request):
                         marital_status=f_status[i] if i < len(f_status) else "unmarried",
                         spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                         spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                        spouse_dob=f_sp_dob_val
+                        spouse_dob=f_sp_dob_val,
+                        
+                        # 🌟 NEW: Database mein naya occupation field yahan save hoga
+                        occupation=occ_val
                     )
 
             return redirect('profile_view', member_id=member.id)
             
         except Exception as e:
             # 🔥 YEH LINE ASLI ERROR KO RENDER LOGS MEIN ZABARDASTI PRINT KAREGI
+            import traceback
             print("🔴🔴 BHYANKAR BACKEND ERROR DETECTED 🔴🔴")
             print(traceback.format_exc())
             # Taki screen par 500 error ke bajay error text dikh jaye testing ke liye

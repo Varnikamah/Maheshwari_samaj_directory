@@ -32,7 +32,7 @@
 <div class="card">
     <div class="card-header"><h2>Member Registration</h2></div>
     <div class="card-body">
-        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}{% endif %}" method="POST">
+        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}" method="POST">
             {% csrf_token %}
 
             <div class="section-box">
@@ -109,6 +109,11 @@
                         <div><label>Birth Date:</label><input type="date" name="member_dob[]" class="dob-field" value="{{ fm.dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;"></div>
                     </div>
 
+                    <div style="margin-top: 10px;">
+                        <label>Occupation / Current Status:</label>
+                        <input type="text" name="member_occupation[]" value="{{ fm.occupation|default_if_none:'' }}" placeholder="e.g., Student - Kota / Job - Pune / Homemaker" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+                    </div>
+
                     <label style="margin-top: 10px; display: block;">Status:</label>
                     <select name="member_married[]" id="s_old_{{ forloop.counter }}" onchange="toggleSpouse('s_old_{{ forloop.counter }}', 'd_old_{{ forloop.counter }}')" style="width: 100%; padding: 8px;">
                         <option value="unmarried" {% if fm.marital_status == 'unmarried' %}selected{% endif %}>Unmarried</option>
@@ -120,7 +125,7 @@
                         <input type="text" name="member_spouse_name[]" value="{{ fm.spouse_name|default:'' }}" placeholder="Spouse Name" style="width: 100%;">
                         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                             <input type="tel" name="member_spouse_phone[]" value="{{ fm.spouse_phone|default:'' }}" placeholder="Spouse Phone" maxlength="10" style="width: 100%;">
-                            <input type="date" name="member_spouse_dob[]" class="dob-field"value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
+                            <input type="date" name="member_spouse_dob[]" class="dob-field" value="{{ fm.spouse_dob|date:'Y-m-d' }}" onkeydown="return false" style="width: 100%;">
                         </div>
                     </div>
                 </div>
@@ -137,14 +142,11 @@
 </div>
 
 <script>
-
-
     let todayDate = new Date().toISOString().split('T')[0];
     let dobFields = document.querySelectorAll('.dob-field');
     dobFields.forEach(function(field) {
         field.setAttribute('max', todayDate);
     });
-
 
     function toggleSpouse(selectId, divId) {
         var statusElement = document.getElementById(selectId);
@@ -168,6 +170,7 @@
         document.getElementById('head_full_info').style.display = isHead ? 'none' : 'block';
     }
 
+    // 🌟 NEW: JavaScript function mein occupation input box jod diya hai dynamic rows ke liye
     function addFamilyRow() {
         const id = Date.now();
         const html = `
@@ -179,6 +182,11 @@
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <div><label>Phone:</label><input type="tel" name="member_phone[]" placeholder="Phone" maxlength="10" style="width: 100%;"></div>
                     <div><label>Birth Date:</label><input type="date" name="member_dob[]" required onkeydown="return false" style="width: 100%;"></div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <label>Occupation / Current Status:</label>
+                    <input type="text" name="member_occupation[]" placeholder="e.g., Student - Kota / Job - Pune / Homemaker" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
                 </div>
                 
                 <label style="margin-top: 10px; display: block;">Status:</label>
@@ -197,8 +205,5 @@
                 </div>
             </div>`;
         document.getElementById('family-container').insertAdjacentHTML('beforeend', html);
-
     }
 </script>
-</body>
-</html>
