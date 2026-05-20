@@ -275,6 +275,9 @@ def edit_profile(request, member_id):
 
         for i in range(len(f_names)):
             if f_names[i].strip():
+                s_occ = ""
+                if i < len(f_spouse_occupations):
+                    s_occ = f_spouse_occupations[i].strip()
                 FamilyMember.objects.create(
                     member=member,
                     name=f_names[i].strip(),

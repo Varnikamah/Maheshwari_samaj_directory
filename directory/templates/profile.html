@@ -170,8 +170,7 @@
         <p style="font-size: 15px; color: #444;">{{ member.detailed_address }}</p>
         <p style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;"><strong>Area:</strong> {{ member.area.name|default:"Not Specified" }}</p>
     </div>
-
-    <div class="info-card" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+<div class="info-card" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <div style="color: #bf953f; font-weight: bold; margin-bottom: 15px;">👨‍👩‍👧‍👦 Family Members</div>
         
         {% for fm in family_members %}
