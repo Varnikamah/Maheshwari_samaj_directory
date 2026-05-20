@@ -270,12 +270,18 @@ def edit_profile(request, member_id):
         f_sp_names = request.POST.getlist('member_spouse_name[]')
         f_sp_phones = request.POST.getlist('member_spouse_phone[]') 
         f_sp_dobs = request.POST.getlist('member_spouse_dob[]')     
+        
+        # Form se saare members ka occupation list catch karo
+        f_occupations = request.POST.getlist('member_occupation[]')
 
         member.family_members.all().delete()
         
         for i in range(len(f_names)):
             name_val = f_names[i].strip()
             if name_val:  
+                # Safe indexing for occupation value
+                occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
+
                 FamilyMember.objects.create(
                     member=member,
                     name=name_val,
@@ -284,11 +290,13 @@ def edit_profile(request, member_id):
                     marital_status=f_status[i] if i < len(f_status) else "unmarried",
                     spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                     spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None
+                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None,
+                    occupation=occ_val
                 )
 
         return redirect('profile_view', member_id=member.id)
 
+    # 🌟 GET REQUEST WAALE SECTOR KO SAFE KARR RHE HAI TAKI PAGE LOAD HOTE WAQT CRASH NA HO
     return render(request, 'register.html', {
         'member': member, 
         'areas': areas, 
