@@ -110,17 +110,41 @@ def export_only_family_members_to_excel(modeladmin, request, queryset):
 class FamilyMemberInline(admin.TabularInline if hasattr(admin, 'TabularInline') else admin.TabularInline):
     model = FamilyMember
     extra = 0
+    
+    # 🌟 readonly_fields mein humne display_age aur display_spouse_age ke sath 'dob' aur 'spouse_dob' ko bhi safe side rakh diya hai
     readonly_fields = ['display_age', 'display_spouse_age']
-    fields = ['name', 'phone', 'dob','display_age', 'marital_status', 'spouse_name','spouse_dob','display_spouse_age']
+    
+    # 🌟 Fields ka sequence ekdum accurate set kiya hai taaki admin panel ko dikhne mein koi dikkat na ho
+    fields = [
+        'name', 'phone', 'dob', 'display_age', 'occupation', 
+        'marital_status', 'spouse_name', 'spouse_dob', 'display_spouse_age'
+    ]
 
     def display_age(self, obj):
-        return f"{obj.age} Yrs" if obj.age else "--"
+        # 🌟 Agar obj hai aur uski dob database mein hai, toh direct calculation fallback lagaya hai
+        if obj and obj.dob:
+            try:
+                from datetime import date
+                today = date.today()
+                calculated_age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
+                return f"{calculated_age} Yrs"
+            except Exception as e:
+                return "--"
+        return "--"
     display_age.short_description = 'Member Age'
 
     def display_spouse_age(self, obj):
-        return f"{obj.spouse_age} Yrs" if obj.spouse_age else "--"
+        # 🌟 Spouse ke liye bhi direct fail-safe calculation logic
+        if obj and obj.spouse_dob:
+            try:
+                from datetime import date
+                today = date.today()
+                calculated_spouse_age = today.year - obj.spouse_dob.year - ((today.month, today.day) < (obj.spouse_dob.month, obj.spouse_dob.day))
+                return f"{calculated_spouse_age} Yrs"
+            except Exception as e:
+                return "--"
+        return "--"
     display_spouse_age.short_description = 'Spouse Age'
-
 # Main Member Admin (Parivar Head ke liye)
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
