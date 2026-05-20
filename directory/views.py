@@ -275,16 +275,15 @@ def edit_profile(request, member_id):
 
         for i in range(len(f_names)):
             if f_names[i].strip():
-                s_occ = ""
-                if i < len(f_spouse_occupations):
-                    s_occ = f_spouse_occupations[i].strip()
+                val_spouse_occ = f_spouse_occupations[i].strip() if i < len(f_spouse_occupations) else ""
+               
                 FamilyMember.objects.create(
                     member=member,
                     name=f_names[i].strip(),
                     phone=f_phones[i] if i < len(f_phones) else "",
                     dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
                     occupation=f_occupations[i].strip() if i < len(f_occupations) else "",
-                    spouse_occupation=f_spouse_occupations[i].strip() if i < len(f_spouse_occupations) else ""
+                    spouse_occupation=val_spouse_occ
                 )
         
         return redirect('profile_view', member_id=member.id)
