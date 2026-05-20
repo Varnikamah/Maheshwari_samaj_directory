@@ -6,7 +6,7 @@
         
         <h2 style="color: #bf953f; text-align: center; margin-bottom: 20px;">Edit Profile</h2>
 
-        <form action="/final-update/{{ member.id }}/" method="POST">
+        <form action="{%url 'edit_profile' member.id %}" method="POST">
             {% csrf_token %}
 
             <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 10px;">
@@ -27,6 +27,15 @@
                 </div>
             </div>
 
+            <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 10px; background: #fffaf0;">
+                <p style="font-weight: bold; color: #bf953f; border-bottom: 1px solid #eee; padding-bottom: 5px;">Occupation Details</p>
+                <label style="display:block; margin-top:10px; font-size:14px;">Mukhiya Occupation:</label>
+                <input type="text" name="head_occupation" value="{{ member.head_occupation|default:'' }}" placeholder="e.g., Business / Job" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+                
+                <label style="display:block; margin-top:10px; font-size:14px;">Spouse Occupation:</label>
+                <input type="text" name="spouse_occupation" value="{{ member.spouse_occupation|default:'' }}" placeholder="e.g., Homemaker / Job" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
+            </div>
+
             <div style="margin-bottom: 25px; padding: 15px; border: 1px solid #e3f2fd; border-radius: 10px; background: #f0f7ff;">
                 <label style="font-weight: bold; color: #0050b3;">क्या आप ही परिवार के मुखिया (Head) हैं?</label>
                 <div style="display: flex; gap: 20px; margin-top: 10px;">
@@ -43,22 +52,12 @@
                         <input type="date" name="head_dob" value="{{ member.head_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
                     </div>
                     
-                    <div style="margin-top: 10px; margin-bottom: 15px;">
-                        <label style="font-size:13px; color:#555;">Mukhiya Occupation / Current Status:</label>
-                        <input type="text" name="head_occupation" value="{{ member.head_occupation|default:'' }}" placeholder="e.g., Business / Job / Retired" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
-                    </div>
-                    
                     <label style="display:block; margin-top:10px; font-size:14px;">Mukhiya Spouse Details:</label>
                     <input type="text" name="head_spouse_name" placeholder="Spouse Name" value="{{ member.head_spouse_name }}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;">
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
                         <input type="tel" name="head_spouse_phone" placeholder="Spouse Phone" value="{{ member.head_spouse_phone }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
                         <input type="date" name="head_spouse_dob" value="{{ member.head_spouse_dob|date:'Y-m-d' }}" style="padding:8px; border:1px solid #ccc; border-radius:5px;">
-                    </div>
-
-                    <div style="margin-top: 10px;">
-                        <label style="font-size:13px; color:#555;">Spouse Occupation / Current Status:</label>
-                        <input type="text" name="spouse_occupation" value="{{ member.spouse_occupation|default:'' }}" placeholder="e.g., Homemaker / Teacher / Business" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
                     </div>
                 </div>
             </div>
@@ -71,11 +70,9 @@
                         <input type="text" name="member_name[]" value="{{ fm.name }}" placeholder="Name" style="width:80%; padding:5px; margin-bottom:5px;">
                         <input type="date" name="member_dob[]" value="{{ fm.dob|date:'Y-m-d' }}" style="width:45%; padding:5px;">
                         <input type="tel" name="member_phone[]" value="{{ fm.phone }}" placeholder="Phone" style="width:45%; padding:5px;">
-                        
                         <div style="margin-top: 8px;">
-                            <input type="text" name="member_occupation[]" value="{{ fm.occupation|default_if_none:'' }}" placeholder="Occupation / Current Status (e.g. Student - Kota / Job - Pune)" style="width: 95%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+                            <input type="text" name="member_occupation[]" value="{{ fm.occupation|default_if_none:'' }}" placeholder="Occupation (e.g. Student - Kota)" style="width: 95%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
                         </div>
-                        
                         <button type="button" onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer; position: absolute; top: 10px; right: 10px; font-weight: bold;">✖ Remove</button>
                     </div>
                     {% endfor %}
@@ -86,12 +83,8 @@
             <div style="margin-bottom: 25px;">
                 <label style="display:block; font-size:14px;">Gotra:</label>
                 <input type="text" name="gotra" value="{{ member.gotra }}" required style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
-                
-                <div style="margin-top:10px;">
-                    <label style="display:block; font-size:14px;">Area PIN Code:</label>
-                    <input type="text" name="pin" value="{{ member.pin }}" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
-                </div>
-
+                <label style="display:block; margin-top:10px; font-size:14px;">Area PIN Code:</label>
+                <input type="text" name="pin" value="{{ member.pin }}" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">
                 <label style="display:block; margin-top:10px; font-size:14px;">Detailed Address:</label>
                 <textarea name="detailed_address" rows="3" style="width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px;">{{ member.detailed_address }}</textarea>
             </div>
@@ -102,7 +95,7 @@
         </form>
     </div>
 </div>
-
+{% endblock %}
 <script>
 function toggleHeadSection() {
     const isHeadNo = document.getElementById('is_head_no').checked;

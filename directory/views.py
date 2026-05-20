@@ -236,71 +236,58 @@ def edit_profile(request, member_id):
     areas = Area.objects.all()
 
     if request.method == "POST":
+        # 1. Basic Fields update
         member.name = request.POST.get('name')
         member.phone_number = request.POST.get('phone_number')
-        member.head_occupation = request.POST.get('head_occupation') or ""     
         member.pin = request.POST.get('pin')
         member.dob = request.POST.get('dob') or None
         member.marital_status = request.POST.get('marital_status')
-        
-        member.spouse_name = request.POST.get('spouse_name')
-        member.spouse_phone = request.POST.get('spouse_phone')
-        member.spouse_dob = request.POST.get('spouse_dob') or None
-        member.spouse_occupation = request.POST.get('spouse_occupation') or "" 
         member.gotra = request.POST.get('gotra')
         member.detailed_address = request.POST.get('detailed_address')
         
+        # 2. Occupation Fields (Naye fields yahan catch honge)
+        member.head_occupation = request.POST.get('head_occupation', '').strip()
+        member.spouse_occupation = request.POST.get('spouse_occupation', '').strip()
+        
+        # Spouse fields
+        member.spouse_name = request.POST.get('spouse_name')
+        member.spouse_phone = request.POST.get('spouse_phone')
+        member.spouse_dob = request.POST.get('spouse_dob') or None
+        
+        # Area update
         area_id = request.POST.get('area')
         if area_id:
             try:
                 member.area = Area.objects.get(id=area_id)
             except: pass
 
-        member.is_head = True 
-        
         member.save()
 
-        # 3. Family Members Logic (Dynamic lists)
+        # 3. Family Members Logic
+        member.family_members.all().delete()
         f_names = request.POST.getlist('member_name[]')
         f_phones = request.POST.getlist('member_phone[]')
         f_dobs = request.POST.getlist('member_dob[]')
-        f_status = request.POST.getlist('member_married[]')
-        f_sp_names = request.POST.getlist('member_spouse_name[]')
-        f_sp_phones = request.POST.getlist('member_spouse_phone[]') 
-        f_sp_dobs = request.POST.getlist('member_spouse_dob[]')     
-        
-        # Form se saare members ka occupation list catch karo
         f_occupations = request.POST.getlist('member_occupation[]')
 
-        member.family_members.all().delete()
-        
         for i in range(len(f_names)):
-            name_val = f_names[i].strip()
-            if name_val:  
-                # Safe indexing for occupation value
-                occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
-
+            if f_names[i].strip():
                 FamilyMember.objects.create(
                     member=member,
-                    name=name_val,
+                    name=f_names[i].strip(),
                     phone=f_phones[i] if i < len(f_phones) else "",
                     dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i]) else None,
-                    marital_status=f_status[i] if i < len(f_status) else "unmarried",
-                    spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
-                    spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i]) else None,
-                    occupation=occ_val
+                    occupation=f_occupations[i].strip() if i < len(f_occupations) else ""
                 )
-
+        
         return redirect('profile_view', member_id=member.id)
 
-    # 🌟 GET REQUEST WAALE SECTOR KO SAFE KARR RHE HAI TAKI PAGE LOAD HOTE WAQT CRASH NA HO
     return render(request, 'register.html', {
         'member': member, 
         'areas': areas, 
-        'edit_mode': True,
-        'temp_phone': member.phone_number
+        'edit_mode': True
     })
+
 def directory_view(request):
     query = request.GET.get('search', '') 
     
