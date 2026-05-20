@@ -32,7 +32,8 @@ class Member(models.Model):
     head_spouse_name = models.CharField(max_length=100, blank=True, null=True)
     head_spouse_phone = models.CharField(max_length=15, blank=True, null=True)
     head_spouse_dob = models.DateField(blank=True, null=True)
-
+    head_occupation = models.CharField(max_length=100, blank=True, null=True)
+    spouse_occupation = models.CharField(max_length=100, blank=True, null=True)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
     detailed_address = models.TextField()
 
@@ -88,7 +89,7 @@ class FamilyMember(models.Model):
     spouse_phone = models.CharField(max_length=15, null=True, blank=True)
     spouse_dob = models.DateField(null=True, blank=True)
 
-    occupation = models.TextField(blank=True, null=True)
+    occupation = models.CharField(max_length=100, blank=True, null=True)
 
     @property
     def age(self):
