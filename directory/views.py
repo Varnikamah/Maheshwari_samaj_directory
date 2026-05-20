@@ -84,6 +84,8 @@ def update_member(request, id=None, member_id=None):
             member.detailed_address = request.POST.get('detailed_address')
             member.pin = request.POST.get('pin')
 
+            member.head_occupation = request.POST.get('head_occupation', '').strip()
+            member.spouse_occupation = request.POST.get('spouse_occupation', '').strip()
             member.spouse_name = request.POST.get('spouse_name')
             member.spouse_phone = request.POST.get('spouse_phone')
             
