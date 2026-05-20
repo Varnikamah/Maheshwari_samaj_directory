@@ -106,7 +106,6 @@ def update_member(request, id=None, member_id=None):
             f_sp_names = request.POST.getlist('member_spouse_name[]')
             f_sp_phones = request.POST.getlist('member_spouse_phone[]')
             f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
-
             f_occupations = request.POST.getlist('member_occupation[]')
 
             FamilyMember.objects.filter(member=member).delete()
@@ -114,8 +113,9 @@ def update_member(request, id=None, member_id=None):
             for i in range(len(f_names)):
                 name_val = f_names[i].strip()
                 if name_val:
-                    f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and f_dobs[i].strip() != "") else None
-                    f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and f_sp_dobs[i].strip() != "") else None
+                    # 🌟 SAFE CLEANING: `.strip()` tabhi chalega jab string confirm ho
+                    f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i] and str(f_dobs[i]).strip() != "") else None
+                    f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i] and str(f_sp_dobs[i]).strip() != "") else None
 
                     occ_val = f_occupations[i].strip() if (i < len(f_occupations) and f_occupations[i]) else ""
 
@@ -134,6 +134,7 @@ def update_member(request, id=None, member_id=None):
             return redirect('profile_view', member_id=member.id)
 
         except Exception as e:
+            import traceback
             print("🔴🔴 UPDATE FUNCTION CRASHED 🔴🔴")
             print(traceback.format_exc())
             return HttpResponse(f"<h2>Update Error Detailing:</h2><pre>{traceback.format_exc()}</pre>", status=500)
