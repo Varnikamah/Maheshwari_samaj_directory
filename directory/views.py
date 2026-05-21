@@ -299,7 +299,7 @@ def edit_profile(request, member_id):
                     spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
                     spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip()) else None,
                     occupation=f_occupations[i].strip() if i < len(f_occupations) else "",
-                    spouse_occupation="TESTING_DATA"
+                    spouse_occupation=sp_occ
                 )
         return redirect('profile_view', member_id=member.id)
 
