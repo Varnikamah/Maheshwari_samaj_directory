@@ -32,7 +32,7 @@
 <div class="card">
     <div class="card-header"><h2>Member Registration</h2></div>
     <div class="card-body">
-        <form action="{% if member and member.id %}{% url 'update_member' member.id %}{% else %}{% url 'register_member' %}{% endif %}" method="POST">
+        <form action="{% if edit_mode %}{% url 'edit_profile' member.id %}{% else %}{% url 'register_member' %}{% endif %}" method="POST">
             {% csrf_token %}
 
             <div class="section-box">

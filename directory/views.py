@@ -53,6 +53,7 @@ def register(request):
     except Exception as e:
         return HttpResponse(f"Register View Crashed: {str(e)}<br><pre>{traceback.format_exc()}</pre>", status=500)
 def update_member(request, id=None, member_id=None):
+    print("🔴 ALERT: update_member function chal raha hai!")
     target_id = id or member_id
     
     member = get_object_or_404(Member, id=target_id)
@@ -267,6 +268,7 @@ def edit_profile(request, member_id):
             except: pass
 
         member.save()
+        print("✅ SUCCESS: edit_profile view hit ho gaya!") 
 
         # 3. Family Members Logic
         member.family_members.all().delete()
@@ -279,26 +281,25 @@ def edit_profile(request, member_id):
         f_sp_dobs = request.POST.getlist('member_spouse_dob[]')
         f_occupations = request.POST.getlist('member_occupation[]')
         f_spouse_occupations = request.POST.getlist('member_spouse_occupation[]')
-
+        sp_idx = 0
         for i in range(len(f_names)):
             if f_names[i].strip():
-                # Safe access logic
-                f_dob_val = f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip() != "") else None
-                f_sp_dob_val = f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip() != "") else None
+                sp_occ = ""
+                if f_status[i] == 'married' and sp_idx < len(f_spouse_occupations):
+                    sp_occ = f_spouse_occupations[sp_idx].strip()
+                    sp_idx += 1 
                 
-                sp_occ_val = f_spouse_occupations[i].strip() if (i < len(f_spouse_occupations) and f_spouse_occupations[i]) else ""
-
                 FamilyMember.objects.create(
                     member=member,
                     name=f_names[i].strip(),
                     phone=f_phones[i] if i < len(f_phones) else "",
-                    dob=f_dob_val,
+                    dob=f_dobs[i] if (i < len(f_dobs) and f_dobs[i].strip()) else None,
                     marital_status=f_status[i] if i < len(f_status) else "unmarried",
                     spouse_name=f_sp_names[i] if i < len(f_sp_names) else "",
                     spouse_phone=f_sp_phones[i] if i < len(f_sp_phones) else "",
-                    spouse_dob=f_sp_dob_val,
+                    spouse_dob=f_sp_dobs[i] if (i < len(f_sp_dobs) and f_sp_dobs[i].strip()) else None,
                     occupation=f_occupations[i].strip() if i < len(f_occupations) else "",
-                    spouse_occupation=sp_occ_val
+                    spouse_occupation="TESTING_DATA"
                 )
         return redirect('profile_view', member_id=member.id)
 

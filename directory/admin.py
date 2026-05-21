@@ -398,7 +398,7 @@ class MemberAdmin(admin.ModelAdmin):
 @admin.register(FamilyMember)
 class FamilyMemberAdmin(admin.ModelAdmin):
     # 🌟 Added occupation to standalone view as well for backup
-    list_display = ['name', 'phone', 'dob', 'occupation', 'marital_status', 'spouse_name', 'member']  
+    list_display = ['name', 'phone', 'dob', 'occupation', 'marital_status', 'spouse_name', 'member','spouse_occupation']  
     actions = [export_only_family_members_to_excel]
 
 
